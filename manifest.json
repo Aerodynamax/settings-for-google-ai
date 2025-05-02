@@ -13,7 +13,9 @@
       "matches": [
         "https://google.com/search*",
         "https://www.google.com/search*"
-      ]
+      ],
+      "run_at": "document_start",
+      "world": "MAIN"
     }
   ]
 }
