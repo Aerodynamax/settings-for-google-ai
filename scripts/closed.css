@@ -1,0 +1,29 @@
+
+/* fader hide text */
+.RDmXvc.Jzkafd.LrrQLb {
+    /* background-image: none;
+    background: #101218;
+
+    min-height: 80px;
+    max-height: 80px; */
+    opacity: 0;
+
+    height: 80px;
+}
+
+/* make text invisible ,.EyBRub.jUja0e.aPfNm */
+.h7Tj7e:not(.zc75bb) .RJPOee.mNfcNd, .h7Tj7e:not(.zc75bb) .EyBRub.jUja0e.aPfNm {
+    opacity: 0;
+    display: none;
+}
+
+/* "Searching" preview */
+.hoqQCc.MyTwIe {
+    height: 48px;
+}
+
+/* "Generating" preview */
+[class="hoqQCc MyTwIe"] {
+    height: 48px;
+    opacity: 0.2;
+}

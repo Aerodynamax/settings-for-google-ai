@@ -10,6 +10,7 @@
   "content_scripts": [
     {
       "js": ["scripts/content.js"],
+      "css": ["scripts/closed.css"],
       "matches": [
         "https://google.com/search*",
         "https://www.google.com/search*"
