@@ -59,24 +59,13 @@ function onOpen() {
 
 
 // center if needed
-waitForElm("#Odp5De:not(:has(.Kevs9.SLPe5b.HdCKGe)) .Kevs9:has( #eKIzJc )").then((overview_container) => {
+waitForElm("#Odp5De:not(:has( .WC0BKe )) .Kevs9:has( #eKIzJc )").then((overview_container) => {
 
     waitForElm("#center_col").then((search_results) => {
 
-        overview_container = document.querySelector("#Odp5De:not(:has(.Kevs9.SLPe5b.HdCKGe)) .Kevs9:has( #eKIzJc )");
+        overview_container = document.querySelector("#Odp5De:not(:has( .WC0BKe )) .Kevs9:has( #eKIzJc )");
 
         if (overview_container != null) { overview_container.className += "s6JM6d ufC5Cb"; }
     });
-
-    // make AI Overview panel be same size as search results
     
-    // "searching" often messes with this, delete incorrect styling.Kevs9.SLPe5bs6JM6d.ufC5Cb
-    // document.querySelector("#Odp5De:has(.Kevs9.SLPe5b.HdCKGe) .Kevs9.SLPe5bs6JM6d.ufC5Cb").className = "Kevs9 SLPe5b";
-    // (change the size if there isn't a long snippet at the top)
-    // document.querySelector("#Odp5De:not(:has(.Kevs9.SLPe5b.HdCKGe)) .Kevs9.SLPe5b:has(>div[jscontroller='qTdDb']>#eKIzJc)")
-    
-    // if (document.querySelectorAll("#Odp5De>.YNk70c.EjQTId").length < 3) {
-    //     document.querySelector(".Kevs9.SLPe5b:has(>div[jscontroller='qTdDb']>#eKIzJc)").className += "s6JM6d ufC5Cb";
-    // }
-
 });

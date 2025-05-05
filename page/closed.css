@@ -1,11 +1,6 @@
 
 /* fader hide text */
 .RDmXvc.Jzkafd.LrrQLb {
-    /* background-image: none;
-    background: #101218;
-
-    min-height: 80px;
-    max-height: 80px; */
     opacity: 0;
 
     height: 80px;
@@ -19,11 +14,11 @@
 
 /* "Searching" preview */
 .hoqQCc.MyTwIe {
-    height: 48px;
+    height: 46px !important;
 }
 
 /* "Generating" preview */
 [class="hoqQCc MyTwIe"] {
-    height: 48px;
-    opacity: 0.2;
+    height: 46px !important;
+    opacity: 0.2 !important;
 }
