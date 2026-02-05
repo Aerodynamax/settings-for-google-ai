@@ -1,42 +1,53 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Better AI Overview Extension</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <!-- <h1>AI Overview Settings</h1> -->
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Better AI Overview Extension</title>
+        <link rel="stylesheet" href="styles.css" />
+        <script defer type="module" src="script.js"></script>
+    </head>
+    <body>
+        <!-- <h1>AI Overview Settings</h1> -->
 
-    <form>
-
-        <fieldset>
+        <form id="overviewSettings">
             <legend>
                 <h2>Display Settings</h2>
             </legend>
 
             <div class="center">
-                <img src="" alt="AI Overview Display Preview">
+                <img src="" alt="AI Overview Display Preview" />
             </div>
-    
-            <label for="OverviewHide">
+
+            <label for="overviewHide">
                 <h3>Hide</h3>
-                <input type="radio" name="Display" id="OverviewHide" value="hide">
+                <input
+                    type="radio"
+                    name="overviewDisplay"
+                    id="overviewHide"
+                    value="hide"
+                />
             </label>
 
-            <label for="OverviewCondensed">
+            <label for="overviewCondensed">
                 <h3>Condensed</h3>
-                <input type="radio" name="Display" id="OverviewCondensed" value="condensed">
+                <input
+                    type="radio"
+                    name="overviewDisplay"
+                    id="overviewCondensed"
+                    value="condensed"
+                />
             </label>
 
-            <label for="OverviewVisible">
+            <label for="overviewVisible">
                 <h3>Visible</h3>
-                <input type="radio" name="Display" id="OverviewVisible" value="visible">
+                <input
+                    type="radio"
+                    name="overviewDisplay"
+                    id="overviewVisible"
+                    value="visible"
+                />
             </label>
-            
-        </fieldset>
-
-    </form>
-</body>
+        </form>
+    </body>
 </html>

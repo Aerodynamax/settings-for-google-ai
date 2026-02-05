@@ -4,31 +4,21 @@
   "version": "0.0",
   "manifest_version": 3,
   "action": {
+    "default_popup": "popup/index.html",
     "default_icon": {
       "16": "imgs/icon.png",
       "48": "imgs/icon.png",
       "128": "imgs/icon.png"
     }
   },
-  "permissions": ["storage", "declarativeContent", "activeTab", "scripting"],
-
-  "background": {
-    "service_worker": "popup/addPopup.js"
-  },
-  "web_accessible_resources": [{
-    "resources": [
-      "popup/index.html",
-      "popup/styles.css"
-    ],
-    "matches": [
-      "<all_urls>"
-    ]
-  }],
+  "permissions": [
+    "storage",
+    "activeTab"
+  ],
 
   "content_scripts": [
     {
       "js": ["page/content.js"],
-      "css": ["page/closed.css"],
       "matches": [
         "https://google.com/search*",
         "https://www.google.com/search*"
