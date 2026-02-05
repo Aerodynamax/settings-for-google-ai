@@ -11,20 +11,29 @@
       "128": "imgs/icon.png"
     }
   },
+
   "permissions": [
     "storage",
     "activeTab"
   ],
 
+  "web_accessible_resources": [{
+    "resources": [
+      "dist/content.bundle.js.map"
+    ],
+    "matches": [
+      "<all_urls>"
+    ]
+  }],
+
   "content_scripts": [
     {
-      "js": ["page/content.js"],
+      "js": ["dist/content.bundle.js"],
       "matches": [
         "https://google.com/search*",
         "https://www.google.com/search*"
       ],
-      "run_at": "document_start",
-      "world": "MAIN"
+      "run_at": "document_start"
     }
   ]
 }

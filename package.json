@@ -1,5 +1,12 @@
 {
+  "scripts": {
+    "dev": "npx esbuild page/content.js --bundle --sourcemap --outfile=dist/content.bundle.js --watch",
+    "build": "npx esbuild page/content.js --bundle --sourcemap --outfile=dist/content.bundle.js"
+  },
   "dependencies": {
     "@types/chrome": "^0.1.36"
+  },
+  "devDependencies": {
+    "esbuild": "^0.27.2"
   }
 }

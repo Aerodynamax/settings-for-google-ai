@@ -5,7 +5,7 @@
     if (!optionsForm) return;
 
     // load saved settings
-    const { overviewDisplay = "visible" } =
+    const { overviewDisplay = "condensed" } =
         await chrome.storage.local.get("overviewDisplay");
 
     const radio = optionsForm.querySelector(
