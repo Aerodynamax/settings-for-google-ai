@@ -1,6 +1,27 @@
 import { waitForElm } from "../utils.ts";
 
 export function applyCondensed(overviewElem: HTMLElement) {
+    // do nothing if already open
+    if ( document.querySelector(`div[aria-label="Show more AI Overview"][aria-expanded="true"]`) !== null )
+        return;
+
+    // move into main column
+    let overviewContainerElem = overviewElem.parentElement;
+    while (overviewContainerElem && overviewContainerElem.querySelector(`h1`)?.textContent !== "AI overview") {
+        overviewContainerElem = overviewContainerElem.parentElement;
+    }
+    if (overviewContainerElem && overviewContainerElem.parentElement) {
+        overviewContainerElem.parentElement.setAttribute("overviewOriginalParentNode", "");
+        
+        // move overview
+        waitForElm(`div[role="main"]`).then((elem) => {
+            const mainColumn = elem as HTMLElement;
+            
+            if (overviewContainerElem && mainColumn) {
+                mainColumn.prepend(overviewContainerElem);
+            }
+        })
+    }
 
     // condense "Generating ..." view
     overviewElem.style.maxHeight = "120px";
@@ -10,7 +31,7 @@ export function applyCondensed(overviewElem: HTMLElement) {
     waitForElm(`div[jsaction="trigger.OiPALb"]`).then((elem) => {
         if (!elem) return;
 
-        const overviewOpenBtn = elem as HTMLElement
+        const overviewOpenBtn = elem as HTMLElement;
 
         overviewOpenBtn.addEventListener("click", () => {
             revertCondensed(overviewElem);
@@ -40,13 +61,12 @@ export function applyCondensed(overviewElem: HTMLElement) {
             [...containerElem.children].forEach((child) => {
                 const childNode = child as HTMLElement;
                 
+                // get correct node
                 const bgImg = getComputedStyle(childNode).backgroundImage;
-
                 if ( bgImg !== "none" ) {
+                    childNode.setAttribute("overviewOriginalHeight", childNode.style.height);
 
-                    childNode.setAttribute("overviewOriginalBgImg", bgImg);
-                    //                              don't obsure "AI Overview" text ⌄
-                    childNode.style.backgroundImage = "linear-gradient(transparent 50px, #22242ae6 52px, var(--xhUGwc) 80px)";
+                    childNode.style.height = "92px";
                 }
 
                 // hide view's content
@@ -65,7 +85,6 @@ export function applyCondensed(overviewElem: HTMLElement) {
                             let elemHeight = parseFloat(getComputedStyle(node).height);
                 
                             if (elemHeight > 60) {
-                                // debugger;
                                 node.setAttribute("overviewOriginalDisplayType", node.style.display);
                                 node.style.display = "none";
                                 break;
@@ -121,6 +140,24 @@ export function revertCondensed(overviewElem: HTMLElement) {
     overviewElem.style.maxHeight = "";
     overviewElem.style.overflow = "";
 
+    // move out of main column
+    let overviewContainerElem = overviewElem.parentElement;
+    while (overviewContainerElem && overviewContainerElem.querySelector(`h1`)?.textContent !== "AI overview") {
+        overviewContainerElem = overviewContainerElem.parentElement;
+    }
+    if (overviewContainerElem && overviewContainerElem.parentElement) {
+        overviewContainerElem.parentElement.setAttribute("overviewOriginalParentNode", "");
+        
+        // move overview
+        waitForElm(`div[overviewOriginalParentNode]`).then((elem) => {
+            const overviewHolder = elem as HTMLElement;
+            
+            if (overviewContainerElem && overviewHolder) {
+                overviewHolder.prepend(overviewContainerElem);
+            }
+        })
+    }
+
     // reset all attributes
     let childNodes = Array.from(overviewElem.children);
 
@@ -134,7 +171,9 @@ export function revertCondensed(overviewElem: HTMLElement) {
         childNode.style.minHeight = childNode.getAttribute("overviewOriginalMinHeight") || childNode.style.minHeight;
         childNode.style.maxHeight = childNode.getAttribute("overviewOriginalMaxHeight") || childNode.style.maxHeight;
         
-        childNode.style.backgroundImage = childNode.getAttribute("overviewOriginalBgImg") || childNode.style.backgroundImage;
+        let origHeight = childNode.getAttribute("overviewOriginalHeight");
+        childNode.style.height = (origHeight !== null) ? origHeight : childNode.style.height;
+        
         
         let origDisplayType = childNode.getAttribute("overviewOriginalDisplayType");
         childNode.style.display = (origDisplayType !== null) ? origDisplayType : childNode.style.display;
