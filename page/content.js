@@ -1,18 +1,21 @@
 import { applyHide, revertHide } from "./modes/hide.ts";
 import { applyCondensed, revertCondensed } from "./modes/condensed.ts";
+import { waitForElm } from "./utils.ts";
 
 async function applyOverviewMode(mode, prevMode) {
     // get AI Overview element
     const searchQuery = new URLSearchParams(window.location.search).get("q");
 
-    const overviewElem = document.querySelector(`div[data-q="${searchQuery}"]`);
+    const overviewElem = await waitForElm(`div[data-q="${searchQuery}"]`);
 
     // revert previous
     switch (prevMode) {
         case "hide":
             revertHide(overviewElem);
+            break;
         case "condensed":
-            revertCondensed();
+            revertCondensed(overviewElem);
+            break;
         case "visible":
         // do nothing
     }
@@ -21,8 +24,10 @@ async function applyOverviewMode(mode, prevMode) {
     switch (mode) {
         case "hide":
             applyHide(overviewElem);
+            break;
         case "condensed":
-            applyCondensed();
+            applyCondensed(overviewElem);
+            break;
         case "visible":
         // do nothing
     }
