@@ -8,10 +8,18 @@
     const { overviewDisplay = "condensed" } =
         await chrome.storage.local.get("overviewDisplay");
 
-    const radio = optionsForm.querySelector(
+    const overviewRadio = optionsForm.querySelector(
         `input[name="overviewDisplay"][value="${overviewDisplay}"]`,
     );
-    if (radio) radio.checked = true;
+    if (overviewRadio) overviewRadio.checked = true;
+
+    const { peopleAlsoAskDisplay = "labelled" } =
+        await chrome.storage.local.get("peopleAlsoAskDisplay");
+
+    const peopleAlsoAskRadio = optionsForm.querySelector(
+        `input[name="peopleAlsoAskDisplay"][value="${peopleAlsoAskDisplay}"]`,
+    );
+    if (peopleAlsoAskRadio) peopleAlsoAskRadio.checked = true;
 
     // save settings changes
     optionsForm.addEventListener("change", (event) => {
@@ -21,6 +29,7 @@
 
         chrome.storage.local.set({
             overviewDisplay: options.overviewDisplay,
+            peopleAlsoAskDisplay: options.peopleAlsoAskDisplay,
         });
     });
 })();

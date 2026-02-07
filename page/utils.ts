@@ -18,3 +18,22 @@ export function waitForElm(selector: string): Promise<Element | null> {
         });
     });
 }
+
+export function isPeopleAlsoAskBox(peopleAlsoAskElem: Element): Boolean {
+    if (!(peopleAlsoAskElem instanceof HTMLDivElement))
+        return false;
+    
+    if (peopleAlsoAskElem.getAttribute("jsname") !== "yEVEwb")
+        return false;
+    
+    return true;
+}
+
+export function isPeopleAlsoAskBoxAI(peopleAlsoAskElem: Element): Boolean {
+    if (!isPeopleAlsoAskBox(peopleAlsoAskElem))
+        return false;
+    
+    return null !== peopleAlsoAskElem.querySelector(
+        `a[aria-label="Learn more about generative AI. Opens in a new tab."]`
+    );
+}

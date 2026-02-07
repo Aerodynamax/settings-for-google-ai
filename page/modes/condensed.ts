@@ -92,8 +92,10 @@ export function applyCondensed(overviewElem: HTMLElement) {
                 const bgImg = getComputedStyle(childNode).backgroundImage;
                 if ( bgImg !== "none" ) {
                     childNode.setAttribute("overviewOriginalHeight", childNode.style.height);
+                    childNode.setAttribute("overviewOriginalBottom", childNode.style.bottom);
 
-                    childNode.style.height = "92px"; // good enough number
+                    childNode.style.height = "58px"; // good enough numbers
+                    childNode.style.bottom = "16px";
                 }
 
                 // hide view's content
@@ -196,6 +198,9 @@ export function revertCondensed(overviewElem: HTMLElement) {
         
         let origHeight = childNode.getAttribute("overviewOriginalHeight");
         childNode.style.height = (origHeight !== null) ? origHeight : childNode.style.height;
+
+        let origBottom = childNode.getAttribute("overviewOriginalBottom");
+        childNode.style.bottom = (origBottom !== null) ? origBottom : childNode.style.bottom;
 
         let origBorderBottom = childNode.getAttribute("overviewOriginalBorderBottom");
         childNode.style.borderBottom = (origBorderBottom !== null) ? origBorderBottom : childNode.style.borderBottom;
