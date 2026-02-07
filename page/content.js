@@ -4,9 +4,8 @@ import { waitForElm } from "./utils.ts";
 
 async function applyOverviewMode(mode, prevMode) {
     // get AI Overview element
-    const searchQuery = new URLSearchParams(window.location.search).get("q");
-
-    const overviewElem = await waitForElm(`div[data-q="${searchQuery}"]`);
+    // gen vs cache properties: [https://www.diffchecker.com/1hSMKGfo/]
+    const overviewElem = await waitForElm(`div[jsname="dEwkXc"]`);
 
     // revert previous
     switch (prevMode) {

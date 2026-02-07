@@ -5,11 +5,17 @@ export function applyCondensed(overviewElem: HTMLElement) {
     if ( document.querySelector(`div[aria-label="Show more AI Overview"][aria-expanded="true"]`) !== null )
         return;
 
+    // delete the stupid fade effect that looks dumb and stupid and dumb
+    waitForElm(`div[jsname="WQ8ckf"]`).then((elem) => {
+        elem?.parentElement?.removeChild(elem);
+    })
+
     // move into main column
     let overviewContainerElem = overviewElem.parentElement;
-    while (overviewContainerElem && overviewContainerElem.querySelector(`h1`)?.textContent !== "AI overview") {
+    while (overviewContainerElem && getComputedStyle(overviewContainerElem).marginBottom === "0px") {
         overviewContainerElem = overviewContainerElem.parentElement;
     }
+
     if (overviewContainerElem && overviewContainerElem.parentElement) {
         overviewContainerElem.parentElement.setAttribute("overviewOriginalParentNode", "");
         
@@ -17,15 +23,28 @@ export function applyCondensed(overviewElem: HTMLElement) {
         waitForElm(`div[role="main"]`).then((elem) => {
             const mainColumn = elem as HTMLElement;
             
-            if (overviewContainerElem && mainColumn) {
+            if (overviewContainerElem && mainColumn && !mainColumn.contains(overviewContainerElem)) {
                 mainColumn.prepend(overviewContainerElem);
             }
         })
     }
 
-    // condense "Generating ..." view
-    overviewElem.style.maxHeight = "120px";
+    // condense overview pane
+    overviewElem.style.maxHeight = "95px";
     overviewElem.style.overflow = "clip";
+
+    // remove bottom bar
+    // [https://github.com/marianc000/children]
+    const overviewPaneElems = overviewElem.getElementsByTagName(`*`);
+    Array.from(overviewPaneElems).forEach((elem) => {
+        const element = elem as HTMLElement;
+        
+        if (element instanceof HTMLDivElement && !getComputedStyle(element).borderBottom.includes("0px")) {
+            
+            element.setAttribute("overviewOriginalBorderBottom", element.style.borderBottom);
+            element.style.borderBottom = "0px";
+        }
+    });
 
     // show content on "Show overview" click
     waitForElm(`div[jsaction="trigger.OiPALb"]`).then((elem) => {
@@ -54,6 +73,14 @@ export function applyCondensed(overviewElem: HTMLElement) {
                 elem.textContent = "Show overview";
         });
 
+        // show background if previously removed
+        Array.from( showMoreBtn.getElementsByTagName(`*`) ).forEach((elem) => {
+            const showMoreBtnBorder = elem as HTMLElement;
+
+            let origBorderBottom = showMoreBtnBorder.getAttribute("overviewOriginalBorderBottom");
+            showMoreBtnBorder.style.borderBottom = (origBorderBottom !== null) ? origBorderBottom : showMoreBtnBorder.style.borderBottom;
+        });
+
         // show overview button background
         if (showMoreBtn.parentElement && showMoreBtn.parentElement.parentElement && showMoreBtn.parentElement.parentElement.parentElement) {
             const containerElem = showMoreBtn.parentElement.parentElement.parentElement;
@@ -66,7 +93,7 @@ export function applyCondensed(overviewElem: HTMLElement) {
                 if ( bgImg !== "none" ) {
                     childNode.setAttribute("overviewOriginalHeight", childNode.style.height);
 
-                    childNode.style.height = "92px";
+                    childNode.style.height = "92px"; // good enough number
                 }
 
                 // hide view's content
@@ -111,24 +138,20 @@ export function applyCondensed(overviewElem: HTMLElement) {
             if (childNode instanceof HTMLDivElement) {
                 let elemMinHeight = parseFloat(childNode.style.minHeight);
     
-                if (!Number.isNaN(elemMinHeight) && elemMinHeight > 120) {
+                if (!Number.isNaN(elemMinHeight) && elemMinHeight > 110) {
                     childNode.setAttribute("overviewOriginalMinHeight", childNode.style.minHeight);
-                    childNode.style.minHeight = "120px";
+                    childNode.style.minHeight = "110px";
                 }
 
                 let elemMaxHeight = parseFloat(childNode.style.maxHeight);
     
-                if (!Number.isNaN(elemMaxHeight) && elemMaxHeight > 120) {
+                if (!Number.isNaN(elemMaxHeight) && elemMaxHeight > 110) {
                     childNode.setAttribute("overviewOriginalMaxHeight", childNode.style.maxHeight);
-                    childNode.style.maxHeight = "120px";
+                    childNode.style.maxHeight = "110px";
                 }
             }
             
         }
-
-        // reset "Generating ..." view size
-        overviewElem.style.maxHeight = "";
-        overviewElem.style.overflow = "";
     });
 
 
@@ -173,7 +196,9 @@ export function revertCondensed(overviewElem: HTMLElement) {
         
         let origHeight = childNode.getAttribute("overviewOriginalHeight");
         childNode.style.height = (origHeight !== null) ? origHeight : childNode.style.height;
-        
+
+        let origBorderBottom = childNode.getAttribute("overviewOriginalBorderBottom");
+        childNode.style.borderBottom = (origBorderBottom !== null) ? origBorderBottom : childNode.style.borderBottom;
         
         let origDisplayType = childNode.getAttribute("overviewOriginalDisplayType");
         childNode.style.display = (origDisplayType !== null) ? origDisplayType : childNode.style.display;
