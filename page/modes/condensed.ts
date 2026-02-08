@@ -167,18 +167,18 @@ export function revertCondensed(overviewElem: HTMLElement) {
 
     // move out of main column
     let overviewContainerElem = overviewElem.parentElement;
-    while (overviewContainerElem && overviewContainerElem.querySelector(`h1`)?.textContent !== "AI overview") {
+    while (overviewContainerElem && getComputedStyle(overviewContainerElem).marginBottom === "0px") {
         overviewContainerElem = overviewContainerElem.parentElement;
     }
     if (overviewContainerElem && overviewContainerElem.parentElement) {
-        overviewContainerElem.parentElement.setAttribute("overviewOriginalParentNode", "");
-        
         // move overview
         waitForElm(`div[overviewOriginalParentNode]`).then((elem) => {
             const overviewHolder = elem as HTMLElement;
             
             if (overviewContainerElem && overviewHolder) {
                 overviewHolder.prepend(overviewContainerElem);
+
+                overviewHolder.removeAttribute("overviewOriginalParentNode");
             }
         })
     }

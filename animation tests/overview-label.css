@@ -1,0 +1,39 @@
+
+body {
+    background-color: #22242a;
+    font-family: Arial, sans-serif;
+    color: #e8e8e8;
+    font-weight: 400;
+    line-height: 24px;
+}
+
+.gradient-background {
+    /* blue, red, yellow, green, grey */
+    /* 
+    https://mobbin.com/colors/brand/google
+    #0943a2
+    #a71d11
+    #967002
+    #2a8642
+
+    #2c2e35
+    */
+
+    background: linear-gradient(45deg, #0943a2 60%, #a71d11, #967002, #2a8642, #2c2e35 75%);
+    background-size: 500%;
+    background-position: 100%;
+    animation: gradient-animation 1s cubic-bezier(0.075, 0.82, 0.165, 1) 1;
+}
+
+/* https://animated-gradient-background-generator.netlify.app/ */
+@keyframes gradient-animation {
+  0% {
+    width: 0;
+    background-position: 0;
+  }
+  100% {
+    /* https://stackoverflow.com/a/38643863 */
+    width: calc-size(max-content, size); 
+    background-position: 100%;
+  }
+}

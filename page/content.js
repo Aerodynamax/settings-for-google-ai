@@ -130,7 +130,7 @@ const observer = new MutationObserver((mutationList) => {
             aiPeopleAlsoAskBox = aiPeopleAlsoAskBox.parentElement;
         }
 
-        if (aiPeopleAlsoAskBox)
+        if (aiPeopleAlsoAskBox && !aiPeopleAlsoAskBox.hasAttribute("AIPAA"))
             applyAlsoAskDisplayModeIndividual(
                 currentPeopleAlsoAskMode,
                 currentPeopleAlsoAskMode,
