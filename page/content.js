@@ -104,33 +104,51 @@ chrome.storage.onChanged.addListener((changes, area) => {
 // update new people also ask boxes with label if required
 
 const observer = new MutationObserver((mutationList) => {
-    // TODO: make this work (reseting "normal" doesn't update DOM so it doesn't explode)
+    // all ai overviews contain a "learn more" link,
+    // when we find this, we get the parent's parent's parent's ... node
 
-    // allChangedNodes = mutationList.flatMap((mutation) => [
-    //     ...mutation.addedNodes,
-    //     ...mutation.removedNodes,
-    //     mutation.target,
-    // ]);
+    let allChangedNodes = mutationList.flatMap((mutation) => [
+        ...mutation.addedNodes,
+        mutation.target,
+    ]);
 
-    let allPeopleAlsoAskBoxes =
-        document.querySelectorAll(`div[jsname="yEVEwb"]`);
+    // only unique & "learn more" links
+    allChangedNodes = allChangedNodes.filter((node, idx) => {
+        if (allChangedNodes.indexOf(node) !== idx) return false;
+        if (!(node instanceof HTMLAnchorElement)) return false;
 
-    if (allPeopleAlsoAskBoxes.length > 0)
-        applyAlsoAskDisplayMode(currentPeopleAlsoAskMode, "normal");
+        return (
+            node.getAttribute("aria-label") ===
+            "Learn more about generative AI. Opens in a new tab."
+        );
+    });
+
+    allChangedNodes.forEach((aiLearnMoreLink) => {
+        let aiPeopleAlsoAskBox = aiLearnMoreLink.parentElement;
+
+        while (aiPeopleAlsoAskBox && !isPeopleAlsoAskBox(aiPeopleAlsoAskBox)) {
+            aiPeopleAlsoAskBox = aiPeopleAlsoAskBox.parentElement;
+        }
+
+        if (aiPeopleAlsoAskBox)
+            applyAlsoAskDisplayModeIndividual(
+                currentPeopleAlsoAskMode,
+                currentPeopleAlsoAskMode,
+                aiPeopleAlsoAskBox,
+            );
+    });
 });
 
 // get setting
-chrome.storage.local.get("peopleAlsoAskDisplay", ({ paaDisplay }) => {
+chrome.storage.local.get("peopleAlsoAskDisplay", ({ peopleAlsoAskDisplay }) => {
+    if (peopleAlsoAskDisplay) currentPeopleAlsoAskMode = peopleAlsoAskDisplay;
+
     // get main page
     waitForElm(`#search`).then((mainPageNode) => {
-        if (paaDisplay) currentPeopleAlsoAskMode = paaDisplay;
-
-        console.log("current mode: " + paaDisplay);
-
         if (mainPageNode) {
             // run on change
             observer.observe(mainPageNode, {
-                attributes: true,
+                attributes: true, // required
                 childList: true,
                 subtree: true,
             });
