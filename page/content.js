@@ -2,6 +2,10 @@ import { applyHide, revertHide } from "./modes/hide.ts";
 import { applyCondensed, revertCondensed } from "./modes/condensed.ts";
 import { appyHighlight, revertHighlight } from "./PAA modes/highlighted.ts";
 import {
+    appyHide as applyHidePAA,
+    revertHide as revertHidePAA,
+} from "./PAA modes/hide.ts";
+import {
     waitForElm,
     isPeopleAlsoAskBox,
     isPeopleAlsoAskBoxAI,
@@ -51,7 +55,7 @@ function applyAlsoAskDisplayModeIndividual(mode, prevMode, elem) {
     // revert previous
     switch (prevMode) {
         case "hide":
-            // TODO
+            revertHidePAA(elem);
             break;
         case "labelled":
             revertHighlight(elem);
@@ -63,7 +67,7 @@ function applyAlsoAskDisplayModeIndividual(mode, prevMode, elem) {
     // apply new
     switch (mode) {
         case "hide":
-            // TODO
+            applyHidePAA(elem);
             break;
         case "labelled":
             appyHighlight(elem);
@@ -144,7 +148,7 @@ chrome.storage.local.get("peopleAlsoAskDisplay", ({ peopleAlsoAskDisplay }) => {
     if (peopleAlsoAskDisplay) currentPeopleAlsoAskMode = peopleAlsoAskDisplay;
 
     // get main page
-    waitForElm(`#search`).then((mainPageNode) => {
+    waitForElm(`#center_col`).then((mainPageNode) => {
         if (mainPageNode) {
             // run on change
             observer.observe(mainPageNode, {

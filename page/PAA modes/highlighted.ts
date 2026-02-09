@@ -22,9 +22,6 @@ export function appyHighlight(mainPAAElem: HTMLElement) {
 
         const childNode = childNodes[i] as HTMLElement;
 
-        // if ( childNode.classList.contains("G3toM") )
-        //     debugger;
-
         // change overview size
         if (childNode instanceof HTMLDivElement && childNode.textContent.trim().endsWith("AI Overview")) {
             
