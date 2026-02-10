@@ -80,10 +80,14 @@ Completely removes the AI Overview snippets from the People also ask sections.
 
 2. Extract the zip to a new/empty folder (if you cloned the repo you can ignore this step).
 
-3. Go to manage extensions (on Chrome: [chrome://extensions](chrome://extensions)).
+3. Open the terminal in the directory (Windows: right click on folder > "Open in Terminal")
 
-4. Enable "developer mode" (on Chrome: there is a toggle in the top right of the page).
+4. Run: `npm run build`. There should now be a new folder called "dist". The project is now ready to add to your browser!
 
-5. Press the "Load unpacked" button and select the folder where you extracted the zip file to (or where you cloned down the repo to).
+5. Go to manage extensions (on Chrome: [chrome://extensions](chrome://extensions)).
 
-6. Enjoy!
+6. Enable "developer mode" (on Chrome: there is a toggle in the top right of the page).
+
+7. Press the "Load unpacked" button and select the folder where all the project files are (the one that holds the "manifest.json" file).
+
+8. Enjoy!
