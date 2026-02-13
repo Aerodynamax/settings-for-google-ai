@@ -1,12 +1,18 @@
 {
   "scripts": {
-    "dev": "npx esbuild page/content.js --bundle --sourcemap --outfile=dist/content.bundle.js --watch",
-    "build": "npx esbuild page/content.js --bundle --sourcemap --outfile=dist/content.bundle.js"
+    "dev:content": "npx esbuild page/content.js --bundle --sourcemap --outfile=dist/content.bundle.js --watch",
+    "dev:popup": "cd popup && npm run dev",
+    "dev:popup-watch": "cd popup && npm run build-watch",
+    "dev": "run-p dev:content dev:popup dev:popup-watch",
+    "build:content": "npx esbuild page/content.js --bundle --sourcemap --outfile=dist/content.bundle.js",
+    "build:popup": "cd popup && npm run build",
+    "build": "run-p build:content build:popup"
   },
   "dependencies": {
     "@types/chrome": "^0.1.36"
   },
   "devDependencies": {
-    "esbuild": "^0.27.2"
+    "esbuild": "^0.27.2",
+    "npm-run-all": "^4.1.5"
   }
 }

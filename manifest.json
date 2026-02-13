@@ -4,7 +4,7 @@
   "version": "0.0",
   "manifest_version": 3,
   "action": {
-    "default_popup": "popup/index.html",
+    "default_popup": "dist/popup/index.html",
     "default_icon": {
       "16": "imgs/icon.png",
       "48": "imgs/icon.png",
