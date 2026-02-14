@@ -30,7 +30,7 @@ export const SettingsOption: FunctionComponent<SettingOptionProps> = ({
     return (
         <label
             htmlFor={optionName + "." + optionValue}
-            className="w-full px-6 py-2 m-0 flex flex-row gap-6"
+            className="w-full px-6 py-2 m-0 flex flex-row gap-6 border-transparent border-b"
         >
             <input
                 type="radio"

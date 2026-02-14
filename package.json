@@ -6,7 +6,7 @@
     "dev": "run-p dev:content dev:popup dev:popup-watch",
     "build:content": "npx esbuild page/content.js --bundle --sourcemap --outfile=dist/content.bundle.js",
     "build:popup": "cd popup && npm run build",
-    "build": "run-p build:content build:popup"
+    "build": "npm i && run-p build:content build:popup"
   },
   "dependencies": {
     "@types/chrome": "^0.1.36"

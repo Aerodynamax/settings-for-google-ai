@@ -9,14 +9,12 @@ function App() {
                     title="AI Overview"
                     settingName="overviewDisplay"
                     settingValues={["hide", "condensed", "visible"]}
-                    onChange={() => {}}
                 />
 
                 <Setting
                     title='AI in "People also ask"'
                     settingName="peopleAlsoAskDisplay"
                     settingValues={["hide", "labelled", "normal"]}
-                    onChange={() => {}}
                 />
 
                 <br />

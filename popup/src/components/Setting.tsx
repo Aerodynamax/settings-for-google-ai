@@ -1,19 +1,36 @@
-import type { FunctionComponent } from "react";
+import { useEffect, type FunctionComponent } from "react";
 import { SettingsOption } from "./SettingsOption";
 
 type Props = {
     title: string;
     settingName: string;
     settingValues: string[];
-    onChange: (newOptionValue: string) => void;
 };
 
 export const Setting: FunctionComponent<Props> = ({
     title,
     settingName,
     settingValues,
-    onChange,
 }) => {
+    // Get data from storage when the component mounts
+    useEffect(() => {
+        // don't break when designing on dev server
+        if (!chrome.storage) return;
+
+        chrome.storage.local.get([settingName]).then((result) => {
+            if (!result[settingName]) return;
+
+            const settingValue = result[settingName] as string;
+
+            // update ui
+            const elem = document.getElementById(
+                settingName + "." + settingValue,
+            ) as HTMLInputElement;
+
+            if (elem) elem.checked = true;
+        });
+    }, []);
+
     return (
         <div className="mx-4">
             <br />
@@ -35,7 +52,14 @@ export const Setting: FunctionComponent<Props> = ({
                         <SettingsOption
                             optionName={settingName}
                             optionValue={setting}
-                            onCheck={onChange}
+                            onCheck={(newValue) => {
+                                // don't break when designing on dev server
+                                if (!chrome.storage) return;
+
+                                chrome.storage.local.set({
+                                    [settingName]: newValue,
+                                });
+                            }}
                         />
                     ))}
                 </div>
