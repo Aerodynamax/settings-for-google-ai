@@ -1,3 +1,5 @@
+// TODO: move ts to somewhere with a real filename
+
 // [https://stackoverflow.com/a/61511955]
 export function waitForElm(selector: string): Promise<Element | null> {
     return new Promise((resolve) => {
@@ -19,7 +21,7 @@ export function waitForElm(selector: string): Promise<Element | null> {
     });
 }
 
-export function isPeopleAlsoAskBox(peopleAlsoAskElem: Element): Boolean {
+export function isPeopleAlsoAskBox(peopleAlsoAskElem: Element): boolean {
     if (!(peopleAlsoAskElem instanceof HTMLDivElement))
         return false;
     
@@ -29,7 +31,7 @@ export function isPeopleAlsoAskBox(peopleAlsoAskElem: Element): Boolean {
     return true;
 }
 
-export function isPeopleAlsoAskBoxAI(peopleAlsoAskElem: Element): Boolean {
+export function isPeopleAlsoAskBoxAI(peopleAlsoAskElem: Element): boolean {
     if (!isPeopleAlsoAskBox(peopleAlsoAskElem))
         return false;
     

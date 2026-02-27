@@ -8,21 +8,25 @@ import {
 import {
     waitForElm,
     isPeopleAlsoAskBox,
-    isPeopleAlsoAskBoxAI,
+    isPeopleAlsoAskBoxAI
 } from "./utils.ts";
 
-async function applyOverviewMode(mode, prevMode) {
+type overviewModes = "hide" | "condensed" | "visible";
+
+async function applyOverviewMode(mode: overviewModes, prevMode: overviewModes) {
     // get AI Overview element
     // gen vs cache properties: [https://www.diffchecker.com/1hSMKGfo/]
     const overviewElem = await waitForElm(`div[jsname="dEwkXc"]`);
 
+    if (!overviewElem) return;
+
     // revert previous
     switch (prevMode) {
         case "hide":
-            revertHide(overviewElem);
+            revertHide(overviewElem as HTMLElement);
             break;
         case "condensed":
-            revertCondensed(overviewElem);
+            revertCondensed(overviewElem as HTMLElement);
             break;
         case "visible":
         // do nothing
@@ -31,27 +35,29 @@ async function applyOverviewMode(mode, prevMode) {
     // apply new
     switch (mode) {
         case "hide":
-            applyHide(overviewElem);
+            applyHide(overviewElem as HTMLElement);
             break;
         case "condensed":
-            applyCondensed(overviewElem);
+            applyCondensed(overviewElem as HTMLElement);
             break;
         case "visible":
         // do nothing
     }
 }
 
-function applyAlsoAskDisplayMode(mode, prevMode) {
+type paaModes = "hide" | "labelled" | "normal";
+
+function applyAlsoAskDisplayMode(mode: paaModes, prevMode: paaModes) {
     // get all AI boxes
     const peopleAlsoAskBoxesAI = Array.from(
         document.querySelectorAll(`div[jsname="yEVEwb"]`),
     ).filter((elem) => isPeopleAlsoAskBoxAI(elem));
 
     peopleAlsoAskBoxesAI.forEach((elem) =>
-        applyAlsoAskDisplayModeIndividual(mode, prevMode, elem),
+        applyAlsoAskDisplayModeIndividual(mode, prevMode, elem as HTMLElement),
     );
 }
-function applyAlsoAskDisplayModeIndividual(mode, prevMode, elem) {
+function applyAlsoAskDisplayModeIndividual(mode: paaModes, prevMode: paaModes, elem: HTMLElement) {
     // revert previous
     switch (prevMode) {
         case "hide":
@@ -78,29 +84,34 @@ function applyAlsoAskDisplayModeIndividual(mode, prevMode, elem) {
 }
 
 // set page settings initially
-chrome.storage.local.get("overviewDisplay", ({ overviewDisplay }) => {
-    applyOverviewMode(overviewDisplay ?? "condensed", "visible");
+chrome.storage.local.get(["overviewDisplay"]).then(({ overviewDisplay }) => {
+    if (!overviewDisplay) return;
+
+    let settingValue = overviewDisplay as string;
+    
+    if (settingValue === "hide" || settingValue === "condensed" || settingValue === "visible")
+        applyOverviewMode(settingValue, "visible");
+    else
+        applyOverviewMode("condensed", "visible");
 });
 
-let currentPeopleAlsoAskMode = "labelled";
+let currentPeopleAlsoAskMode: paaModes = "labelled";
 
 // reload as settings change
 chrome.storage.onChanged.addListener((changes, area) => {
     if (area !== "local") return;
-
+    
     if (changes.overviewDisplay) {
         applyOverviewMode(
-            changes.overviewDisplay.newValue,
-            changes.overviewDisplay.oldValue,
+            changes.overviewDisplay.newValue as overviewModes,
+            changes.overviewDisplay.oldValue as overviewModes,
         );
     }
-
+    
     if (changes.peopleAlsoAskDisplay) {
-        currentPeopleAlsoAskMode = changes.peopleAlsoAskDisplay.newValue;
-
         applyAlsoAskDisplayMode(
-            changes.peopleAlsoAskDisplay.newValue,
-            changes.peopleAlsoAskDisplay.oldValue,
+            changes.peopleAlsoAskDisplay.newValue as paaModes,
+            changes.peopleAlsoAskDisplay.oldValue as paaModes,
         );
     }
 });
@@ -145,7 +156,8 @@ const observer = new MutationObserver((mutationList) => {
 
 // get setting
 chrome.storage.local.get("peopleAlsoAskDisplay", ({ peopleAlsoAskDisplay }) => {
-    if (peopleAlsoAskDisplay) currentPeopleAlsoAskMode = peopleAlsoAskDisplay;
+    if (peopleAlsoAskDisplay)
+        currentPeopleAlsoAskMode = peopleAlsoAskDisplay as paaModes;
 
     // get main page
     waitForElm(`#center_col`).then((mainPageNode) => {
