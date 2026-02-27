@@ -46,6 +46,7 @@ async function applyOverviewMode(mode: overviewModes, prevMode: overviewModes) {
 }
 
 type paaModes = "hide" | "labelled" | "normal";
+type paaAnimatedModes = "never" | "onlyFirst" | "always";
 
 function applyAlsoAskDisplayMode(mode: paaModes, prevMode: paaModes) {
     // get all AI boxes
@@ -76,7 +77,10 @@ function applyAlsoAskDisplayModeIndividual(mode: paaModes, prevMode: paaModes, e
             applyHidePAA(elem);
             break;
         case "labelled":
-            appyHighlight(elem);
+            appyHighlight(
+                elem,
+                currentpaaAnimatedMode === "always" || ( currentpaaAnimatedMode === "onlyFirst" && !elem.hasAttribute("newPAA"))
+            );
             break;
         case "normal":
         // do nothing
@@ -85,22 +89,31 @@ function applyAlsoAskDisplayModeIndividual(mode: paaModes, prevMode: paaModes, e
 
 // set page settings initially
 chrome.storage.local.get(["overviewDisplay"]).then(({ overviewDisplay }) => {
-    if (!overviewDisplay) return;
+    if (!overviewDisplay) overviewDisplay = "condensed";
 
-    let settingValue = overviewDisplay as string;
-    
-    if (settingValue === "hide" || settingValue === "condensed" || settingValue === "visible")
-        applyOverviewMode(settingValue, "visible");
-    else
-        applyOverviewMode("condensed", "visible");
+    const settingValue = overviewDisplay as overviewModes;
+
+    applyOverviewMode(settingValue, "visible");
 });
 
 let currentPeopleAlsoAskMode: paaModes = "labelled";
+
+let currentpaaAnimatedMode: paaAnimatedModes = "onlyFirst";
+
+chrome.storage.local.get(["paaAnimated"]).then(({ paaAnimated }) => {
+    if (!paaAnimated) paaAnimated = "onlyFirst";
+
+    currentpaaAnimatedMode = paaAnimated as paaAnimatedModes;
+});
 
 // reload as settings change
 chrome.storage.onChanged.addListener((changes, area) => {
     if (area !== "local") return;
     
+    if (changes.paaAnimated) {
+        currentpaaAnimatedMode = changes.paaAnimated.newValue as paaAnimatedModes;
+    }
+
     if (changes.overviewDisplay) {
         applyOverviewMode(
             changes.overviewDisplay.newValue as overviewModes,
@@ -109,6 +122,7 @@ chrome.storage.onChanged.addListener((changes, area) => {
     }
     
     if (changes.peopleAlsoAskDisplay) {
+        currentPeopleAlsoAskMode = changes.peopleAlsoAskDisplay.newValue as paaModes;
         applyAlsoAskDisplayMode(
             changes.peopleAlsoAskDisplay.newValue as paaModes,
             changes.peopleAlsoAskDisplay.oldValue as paaModes,
@@ -145,12 +159,25 @@ const observer = new MutationObserver((mutationList) => {
             aiPeopleAlsoAskBox = aiPeopleAlsoAskBox.parentElement;
         }
 
-        if (aiPeopleAlsoAskBox && !aiPeopleAlsoAskBox.hasAttribute("AIPAA"))
+        if (aiPeopleAlsoAskBox && !aiPeopleAlsoAskBox.hasAttribute("AIPAA")) {
+
+            // new people also ask elems load in a sub element of the main people also ask container.
+            // this holder is invisible and doesn't have the progress bar elem.
+            // if there is no progress bar elem in our parent then we are new.
+            let allPeopleAlsoAskContainer = aiPeopleAlsoAskBox.parentElement;
+
+            let allProgressbarElems = [ ...allPeopleAlsoAskContainer?.children ?? [] ].filter((value) => value.getAttribute("role") === "progressbar");
+            
+            if (!allProgressbarElems || allProgressbarElems.length == 0) {
+                aiPeopleAlsoAskBox.setAttribute("newPAA", "");
+            }
+
             applyAlsoAskDisplayModeIndividual(
                 currentPeopleAlsoAskMode,
-                currentPeopleAlsoAskMode,
+                "normal",
                 aiPeopleAlsoAskBox,
             );
+        }
     });
 });
 

@@ -1,7 +1,7 @@
 
 const sparkle = "AI Overview";
 
-export function appyHighlight(mainPAAElem: HTMLElement) {
+export function appyHighlight(mainPAAElem: HTMLElement, animate: boolean = true) {
     if (mainPAAElem.hasAttribute("AIPAA")) return;
 
     mainPAAElem.setAttribute("AIPAA", "");
@@ -40,7 +40,7 @@ export function appyHighlight(mainPAAElem: HTMLElement) {
     headerContainerElem.style.gap = "1em";
     headerContainerElem.style.alignItems = "center";
 
-    headerContainerElem.animate({ gap: ["0", "1em"] }, { duration: 800, easing: "ease", iterations: 1 })
+    headerContainerElem.animate({ gap: ["0", "1em"] }, { duration: animate ? 800 : 0, easing: "ease", iterations: 1 })
 
     // create the indicator
     const indicator = document.createElement(`div`);
@@ -69,7 +69,6 @@ export function appyHighlight(mainPAAElem: HTMLElement) {
     indicator.style.backgroundSize = "500%";
     indicator.style.backgroundPosition = "100%";
 
-
     // animation
     const openningGradientAnim = [
         { display: "block", opacity: "0", width: "0", backgroundPosition: "0" },
@@ -78,7 +77,7 @@ export function appyHighlight(mainPAAElem: HTMLElement) {
     ];
 
     const openningGradientTiming = {
-        duration: 1000,
+        duration: animate ? 1000 : 0,
         easing: "cubic-bezier(0.075, 0.82, 0.165, 1)",
         iterations: 1
     };
@@ -122,6 +121,10 @@ export function revertHighlight(mainPAAElem: HTMLElement) {
         let origCSS = element.getAttribute("overviewOriginalDisplayMode");
         element.style.cssText = (origCSS !== null) ? origCSS : element.style.cssText;
     });
+
+    // even though it isn't set in here (slight oversight lol),
+    // remove the "newPAA" tag so it animates when enabling next time
+    mainPAAElem.removeAttribute("newPAA");
     
     mainPAAElem.removeAttribute("AIPAA");
 }
