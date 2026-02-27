@@ -1,35 +1,56 @@
 import { useEffect, type FunctionComponent } from "react";
 import { SettingsOption } from "./SettingsOption";
 
-type Props = {
+export type SettingProps = {
     title: string;
+    description?: string;
     settingName: string;
-    settingValues: string[];
+    settingDefault: string;
+    settingValues: SettingValue[];
 };
 
-export const Setting: FunctionComponent<Props> = ({
+type SettingValue = {
+    name: string;
+    settings?: SettingProps[];
+};
+
+export function SetSettingsValuesInitial({
+    settingName,
+    settingDefault,
+}: Pick<SettingProps, "settingName" | "settingDefault">) {
+    // don't break when designing on dev server
+    if (!chrome.storage) return;
+
+    chrome.storage.local.get([settingName]).then((result) => {
+        let settingValue = result[settingName] as string;
+
+        if (!result[settingName]) {
+            settingValue = settingDefault;
+            // set in storage
+            chrome.storage.local.set({
+                [settingName]: settingDefault,
+            });
+        }
+
+        // update ui
+        const elem = document.getElementById(
+            settingName + "." + settingValue,
+        ) as HTMLInputElement;
+
+        if (elem) elem.checked = true;
+    });
+}
+
+export const Setting: FunctionComponent<SettingProps> = ({
     title,
     settingName,
+    settingDefault,
     settingValues,
 }) => {
     // Get data from storage when the component mounts
     useEffect(() => {
-        // don't break when designing on dev server
-        if (!chrome.storage) return;
-
-        chrome.storage.local.get([settingName]).then((result) => {
-            if (!result[settingName]) return;
-
-            const settingValue = result[settingName] as string;
-
-            // update ui
-            const elem = document.getElementById(
-                settingName + "." + settingValue,
-            ) as HTMLInputElement;
-
-            if (elem) elem.checked = true;
-        });
-    }, []);
+        SetSettingsValuesInitial({ settingName, settingDefault });
+    });
 
     return (
         <div className="mx-4">
@@ -47,11 +68,12 @@ export const Setting: FunctionComponent<Props> = ({
                         alt={title + " Display Preview"}
                     />
                 </div>
-                <div>
+                <div className="pt-2 px-6">
                     {settingValues.map((setting) => (
                         <SettingsOption
                             optionName={settingName}
-                            optionValue={setting}
+                            optionValue={setting.name}
+                            optionSettings={setting.settings}
                             onCheck={(newValue) => {
                                 // don't break when designing on dev server
                                 if (!chrome.storage) return;
