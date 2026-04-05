@@ -81,7 +81,7 @@ export const SettingsOption: FunctionComponent<SettingOptionProps> = ({
                                 <img
                                     src="./dropdown-arrow.svg"
                                     alt="show settings dropdown button"
-                                    className={`w-6 transition-all ${subsettingsOpen ? "rotate-0" : "-rotate-90"}`}
+                                    className={`w-6 transition-all ${subsettingsOpen ? "translate-y-px rotate-0" : "translate-x-px -rotate-90"}`}
                                 />
                             </div>
                         </label>

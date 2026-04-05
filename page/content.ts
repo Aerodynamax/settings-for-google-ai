@@ -2,6 +2,10 @@ import { applyHide, revertHide } from "./modes/hide.ts";
 import { applyCondensed, revertCondensed } from "./modes/condensed.ts";
 import { appyHighlight, revertHighlight } from "./PAA modes/highlighted.ts";
 import {
+    appyHide as applyHideAIM,
+    revertHide as revertHideAIM,
+} from "./AIM modes/hide.ts";
+import {
     appyHide as applyHidePAA,
     revertHide as revertHidePAA,
 } from "./PAA modes/hide.ts";
@@ -39,6 +43,47 @@ async function applyOverviewMode(mode: overviewModes, prevMode: overviewModes) {
             break;
         case "condensed":
             applyCondensed(overviewElem as HTMLElement);
+            break;
+        case "visible":
+        // do nothing
+    }
+}
+
+type aimModes = "hide" | "visible";
+
+async function applyAIModeMode(mode: overviewModes, prevMode: overviewModes) {
+    // get AI Overview element
+    // gen vs cache properties: [https://www.diffchecker.com/1hSMKGfo/]
+    const googleNavBarElem = await waitForElm(`div.beZ0tf.O1uzAe[role="list"]`);
+
+    if (!googleNavBarElem) return;
+
+    let aimElem: HTMLElement | null = null;
+
+    // find the AI Mode button element
+    googleNavBarElem.childNodes.forEach(node => {
+        const navElem = node as HTMLElement;
+
+        if (navElem.textContent.toLowerCase() == "ai mode") {
+            aimElem = navElem;
+        }
+    });
+
+    if (!aimElem) return;
+
+    // revert previous
+    switch (prevMode) {
+        case "hide":
+            revertHideAIM(aimElem);
+            break;
+        case "visible":
+        // do nothing
+    }
+
+    // apply new
+    switch (mode) {
+        case "hide":
+            applyHideAIM(aimElem);
             break;
         case "visible":
         // do nothing
@@ -96,6 +141,15 @@ chrome.storage.local.get(["overviewDisplay"]).then(({ overviewDisplay }) => {
     applyOverviewMode(settingValue, "visible");
 });
 
+// set page settings initially
+chrome.storage.local.get(["AIModeDisplay"]).then(({ AIModeDisplay }) => {
+    if (!AIModeDisplay) AIModeDisplay = "hide";
+
+    const settingValue = AIModeDisplay as aimModes;
+
+    applyAIModeMode(settingValue, "visible");
+});
+
 let currentPeopleAlsoAskMode: paaModes = "labelled";
 
 let currentpaaAnimatedMode: paaAnimatedModes = "onlyFirst";
@@ -126,6 +180,13 @@ chrome.storage.onChanged.addListener((changes, area) => {
         applyAlsoAskDisplayMode(
             changes.peopleAlsoAskDisplay.newValue as paaModes,
             changes.peopleAlsoAskDisplay.oldValue as paaModes,
+        );
+    }
+
+    if (changes.AIModeDisplay) {
+        applyAIModeMode(
+            changes.AIModeDisplay.newValue as aimModes,
+            changes.AIModeDisplay.oldValue as aimModes
         );
     }
 });

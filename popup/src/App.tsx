@@ -45,6 +45,13 @@ function App() {
                     ]}
                 />
 
+                <Setting
+                    title="AI mode button"
+                    settingName="AIModeDisplay"
+                    settingDefault="hide"
+                    settingValues={[{ name: "hide" }, { name: "visible" }]}
+                />
+
                 <br />
             </form>
         </div>
