@@ -1,29 +1,90 @@
+import { waitForElm } from '../utils';
+
 
 export function appyHide(AIModeElement: HTMLElement) {
-    AIModeElement.setAttribute("AIMDisplay", AIModeElement.style.display);
+    AIModeElement.setAttribute("aimDisplay", AIModeElement.style.display);
     AIModeElement.style.display = "none";
 
+    // remove negative margin
     const googleNavBarElem = AIModeElement.parentElement;
 
-    console.log("nav elem: ");
-    console.log(googleNavBarElem);
+    if (!googleNavBarElem) return;
 
-    if (googleNavBarElem !== null) {
-        googleNavBarElem.setAttribute("AIMMarginLeft", googleNavBarElem.style.marginLeft);
-        googleNavBarElem.style.setProperty("margin-left", "0px", "important");
-    }
+    googleNavBarElem.setAttribute("aimMarginLeft", googleNavBarElem.style.marginLeft);
+    googleNavBarElem.style.setProperty("margin-left", "0px", "important");
+
+    // move next nav item out
+    // TODO: fix on other search pages (e.g. News & books only?)
+
+    // get more menu  ASKLDJSLAK I HATE RELYING ON CSS CLASSES 
+    waitForElm(`.vH6rvf.FJCJfd.IRx9Tb`).then(async elem => {
+        if (!elem) return;
+        const moreMenuElem = elem as HTMLElement;
+        
+        const firstElemInMoreMenu = Array.from(moreMenuElem.children).find(elem => (elem as HTMLElement).role === "none") as HTMLElement | null;
+    
+        if (!firstElemInMoreMenu) return;
+    
+        firstElemInMoreMenu.setAttribute("aimFirstMoreElem", "");
+        // hide
+        // firstElemInMoreMenu.setAttribute("aimDisplay", AIModeElement.style.display);
+        firstElemInMoreMenu.style.display = "none";
+
+        // find listitem child to move
+        let elemToMove = await waitForElm(`[role="listitem"]`, firstElemInMoreMenu);
+        if (!elemToMove) return;
+
+        const aimElemToMove = elemToMove as HTMLElement;
+
+        aimElemToMove.setAttribute("aimElemToMove", "");
+        
+        // set flag on parent
+        if (!aimElemToMove.parentElement) return;
+        const aimMoveElemParent = aimElemToMove.parentElement;
+
+        // save index to "aimParent" attribute
+        aimMoveElemParent.setAttribute("aimMoveElemParent", Array.from(aimMoveElemParent.children).indexOf(aimElemToMove as Element).toString());
+        
+        
+        // no idea why this works ...
+        const newIndex = googleNavBarElem.childNodes.length - 1;
+    
+        googleNavBarElem.insertBefore(aimElemToMove, googleNavBarElem.children[newIndex]);
+    });
 }
 
 
 export function revertHide(AIModeElement: HTMLElement) {
-    let origDisplay = AIModeElement.getAttribute("AIMDisplay");
+    // unhide button
+    let origDisplay = AIModeElement.getAttribute("aimDisplay");
     AIModeElement.style.display = (origDisplay !== null) ? origDisplay : AIModeElement.style.display;
 
+    // restore margin
     const googleNavBarElem = AIModeElement.parentElement;
 
     if (googleNavBarElem) {
-        let origMarginLeft = googleNavBarElem.getAttribute("AIMMarginLeft");
+        let origMarginLeft = googleNavBarElem.getAttribute("aimMarginLeft");
         googleNavBarElem.style.marginLeft = (origMarginLeft !== null) ? origMarginLeft : googleNavBarElem.style.marginLeft;
     }
 
+    // move more elem back in position
+    const aimElemToMove = document.querySelector(`[aimElemToMove]`) as HTMLElement | null;
+    const aimMoveElemParent = document.querySelector(`[aimMoveElemParent]`) as HTMLElement | null;
+    const aimFirstElemInMoreMenu = document.querySelector(`[aimFirstMoreElem]`) as HTMLElement | null;
+    
+    if (!aimElemToMove || !aimMoveElemParent || !aimFirstElemInMoreMenu)
+        return;
+
+    let savedIndex = aimMoveElemParent.getAttribute("aimMoveElemParent") as string;
+    
+    if (savedIndex.length === 0) return;
+    
+    const index = parseInt(savedIndex);
+
+    aimMoveElemParent.insertBefore(aimElemToMove, aimMoveElemParent.children[index-1])
+
+    // make visible
+    // let firstElemOrigDisplay = aimFirstElemInMoreMenu.getAttribute("aimDisplay");
+    // aimFirstElemInMoreMenu.style.display = (firstElemOrigDisplay !== null) ? firstElemOrigDisplay : aimFirstElemInMoreMenu.style.display;
+    aimFirstElemInMoreMenu.style.display = "";
 }

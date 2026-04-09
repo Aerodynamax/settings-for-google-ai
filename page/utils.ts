@@ -1,20 +1,20 @@
 // TODO: move ts to somewhere with a real filename
 
 // [https://stackoverflow.com/a/61511955]
-export function waitForElm(selector: string): Promise<Element | null> {
+export function waitForElm(selector: string, fromElem: Element | Document = document): Promise<Element | null> {
     return new Promise((resolve) => {
-        if (document.querySelector(selector)) {
-            return resolve(document.querySelector(selector));
+        if (fromElem.querySelector(selector)) {
+            return resolve(fromElem.querySelector(selector));
         }
 
         const observer = new MutationObserver((mutations) => {
-            if (document.querySelector(selector)) {
+            if (fromElem.querySelector(selector)) {
                 observer.disconnect();
-                resolve(document.querySelector(selector));
+                resolve(fromElem.querySelector(selector));
             }
         });
 
-        observer.observe(document, {
+        observer.observe(fromElem, {
             childList: true,
             subtree: true,
         });
