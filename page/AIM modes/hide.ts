@@ -14,24 +14,14 @@ export function appyHide(AIModeElement: HTMLElement) {
     googleNavBarElem.style.setProperty("margin-left", "0px", "important");
 
     // move next nav item out
-    // TODO: fix on other search pages (e.g. News & books only?)
 
     // get more menu  ASKLDJSLAK I HATE RELYING ON CSS CLASSES 
     waitForElm(`.vH6rvf.FJCJfd.IRx9Tb`).then(async elem => {
         if (!elem) return;
         const moreMenuElem = elem as HTMLElement;
-        
-        const firstElemInMoreMenu = Array.from(moreMenuElem.children).find(elem => (elem as HTMLElement).role === "none") as HTMLElement | null;
-    
-        if (!firstElemInMoreMenu) return;
-    
-        firstElemInMoreMenu.setAttribute("aimFirstMoreElem", "");
-        // hide
-        // firstElemInMoreMenu.setAttribute("aimDisplay", AIModeElement.style.display);
-        firstElemInMoreMenu.style.display = "none";
 
         // find listitem child to move
-        let elemToMove = await waitForElm(`[role="listitem"]`, firstElemInMoreMenu);
+        let elemToMove = await waitForElm(`[role="listitem"]`, moreMenuElem);
         if (!elemToMove) return;
 
         const aimElemToMove = elemToMove as HTMLElement;
@@ -50,6 +40,20 @@ export function appyHide(AIModeElement: HTMLElement) {
         const newIndex = googleNavBarElem.childNodes.length - 1;
     
         googleNavBarElem.insertBefore(aimElemToMove, googleNavBarElem.children[newIndex]);
+
+
+        // hide the holder for the now taken more menu button
+        let moreButtonHolderElem = aimMoveElemParent.parentElement;
+        
+        while (moreButtonHolderElem && moreButtonHolderElem.parentElement && moreButtonHolderElem.parentElement !== moreMenuElem) {
+            moreButtonHolderElem = moreButtonHolderElem.parentElement;
+        }
+
+        if (!moreButtonHolderElem || !moreButtonHolderElem.parentElement || moreButtonHolderElem.parentElement !== moreMenuElem) return;
+
+        moreButtonHolderElem.setAttribute("aimFirstMoreElem", "");
+        // hide
+        moreButtonHolderElem.style.display = "none";
     });
 }
 
@@ -83,8 +87,7 @@ export function revertHide(AIModeElement: HTMLElement) {
 
     aimMoveElemParent.insertBefore(aimElemToMove, aimMoveElemParent.children[index-1])
 
-    // make visible
-    // let firstElemOrigDisplay = aimFirstElemInMoreMenu.getAttribute("aimDisplay");
-    // aimFirstElemInMoreMenu.style.display = (firstElemOrigDisplay !== null) ? firstElemOrigDisplay : aimFirstElemInMoreMenu.style.display;
+    // make visible - not doing this like I normally would because
+    // the more menu elements are initally display: none;
     aimFirstElemInMoreMenu.style.display = "";
 }
