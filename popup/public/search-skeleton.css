@@ -1,0 +1,270 @@
+.canvas {
+    background-color: #22242a;
+    padding-top: 10px;
+    width: 224px;
+    height: 700px;
+    overflow: hidden;
+
+    & * {
+        box-sizing: border-box;
+        margin: 0px;
+
+        user-select: none;
+        overflow: hidden;
+
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        color: #f7f7f7;
+    }
+}
+
+.search-bar {
+    background-color: #4d5156;
+    width: 80%;
+    margin: auto;
+    height: 2em;
+    border-radius: 1em;
+
+    display: flex;
+    align-items: center;
+    gap: 0.6em;
+
+    & img,
+    & svg {
+        width: 1em;
+    }
+}
+
+.top-nav {
+    height: 2em;
+    border-bottom: #444746 1px solid;
+
+    display: flex;
+    padding: 0.3em 0.5em;
+    padding-top: 0.6em;
+
+    width: 100%;
+
+    & div {
+        width: 3em;
+        height: 100%;
+        border-radius: 0.4em;
+        margin: 0 0.2em;
+
+        background-color: #46494f;
+    }
+    & :nth-child(1) {
+        background-color: #444858;
+    }
+    & :nth-child(2) {
+        width: 1.5em;
+    }
+    & :nth-child(3) {
+        width: 2.5em;
+    }
+    & :nth-child(4) {
+        width: 2em;
+    }
+    & :nth-child(5) {
+        width: 1.8em;
+    }
+    & :nth-child(6) {
+        width: 1.7em;
+    }
+    & :nth-child(7) {
+        width: 2em;
+    }
+    & :nth-last-child(2) {
+        width: 0px;
+        margin: 0px;
+    }
+}
+
+.overview {
+    height: 9em;
+    width: 90%;
+    margin: auto;
+    border-bottom: #424654 1px solid;
+    overflow: hidden;
+
+    position: relative;
+
+    & .title {
+        display: flex;
+        align-items: center;
+        gap: 0.8em;
+        padding-top: 0.5em;
+        font-size: 0.7em;
+
+        & svg {
+            width: 1.6em;
+        }
+    }
+
+    & .contents {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5em;
+        padding-top: 0.5em;
+
+        & .content {
+            background-color: #34517d;
+            height: 0.9em;
+            border-radius: 0.6em;
+        }
+
+        & :nth-child(2n) {
+            width: 97%;
+        }
+        & :nth-child(3n) {
+            width: 40%;
+            margin-bottom: 0.5em;
+        }
+    }
+
+    & .button-bg-fade {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: 6em;
+
+        background-image: linear-gradient(transparent 0%, #22242a 60%);
+    }
+
+    & .show-button {
+        position: absolute;
+        bottom: 0.5em;
+
+        box-sizing: border-box;
+        border: #424654 1px solid;
+        background-color: #22242a;
+        border-radius: 1.1em;
+        height: 1.5em;
+        width: 70%;
+        margin: 0 15%;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5em;
+
+        & .content {
+            background-color: #424654;
+            width: 30%;
+            height: 0.9em;
+            border-radius: 0.5em;
+        }
+
+        & svg {
+            width: 0.8em;
+            fill: #a8c7fa;
+        }
+    }
+}
+
+.results {
+    width: 90%;
+}
+
+.result {
+    width: 95%;
+    margin: auto;
+    margin-top: 0.5em;
+    margin-left: 1em;
+
+    display: flex;
+    gap: 0.3em;
+    padding: 0.5em;
+    flex-direction: column;
+
+    & .site-name {
+        background-color: #46494f;
+        margin-left: 3%;
+        width: 40%;
+        height: 0.5em;
+        border-radius: 0.3em;
+    }
+
+    & .title {
+        background-color: #779ad2;
+        width: 100%;
+        height: 0.9em;
+        border-radius: 0.5em;
+        margin-bottom: 0.1em;
+    }
+
+    & .content {
+        background-color: #434548;
+        margin-left: 3%;
+        width: 92%;
+        height: 0.6em;
+        border-radius: 0.3em;
+    }
+}
+
+.people-also-ask {
+    width: 90%;
+    margin: auto;
+
+    font-size: 0.75em;
+
+    overflow: unset;
+
+    display: flex;
+    gap: 0.5em;
+    padding: 0.5em;
+    padding-bottom: 0;
+    flex-direction: column;
+
+    & .title {
+        height: 1.5em;
+    }
+
+    & .item {
+        height: 1.8em;
+        width: 100%;
+        border-bottom: #444746 1px solid;
+
+        position: relative;
+        display: flex;
+        align-items: flex-start;
+
+        & .ai-label {
+            background-color: #424654;
+            margin-left: 0;
+            width: 0;
+            margin-top: 0.1em;
+            height: 1.1em;
+            border-radius: 0.6em;
+        }
+
+        & .content {
+            background-color: #434548;
+            margin-left: 2%;
+            margin-top: 0.1em;
+            width: 50%;
+            height: 1.1em;
+            border-radius: 0.6em;
+        }
+
+        & svg {
+            position: absolute;
+            right: 0px;
+
+            width: 1.3em;
+            height: 1.3em;
+            fill: #c3c6d6;
+            background-color: #2c2e35;
+            border-radius: 50%;
+        }
+    }
+    & :nth-child(3n) .content {
+        width: 33%;
+    }
+    & :nth-child(4n) .content {
+        width: 67%;
+    }
+
+    & :last-child {
+        border-bottom: 0px;
+    }
+}

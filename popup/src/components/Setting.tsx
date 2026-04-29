@@ -1,5 +1,6 @@
 import { useEffect, type FunctionComponent } from "react";
 import { SettingsOption } from "./SettingsOption";
+import { AnimatedSkeleton } from "./skeleton/AnimatedSkeleton";
 
 export type SettingProps = {
     title: string;
@@ -62,11 +63,12 @@ export const Setting: FunctionComponent<SettingProps> = ({
 
             <div className="bg-neutral-800 py-4 rounded-lg drop-shadow-lg">
                 <div className="flex align-middle justify-center m-1.5">
-                    <img
-                        className="w-11/12 max-w-96 min-h-40 rounded-3xl bg-neutral-700"
-                        src=""
-                        alt={title + " Display Preview"}
-                    />
+                    <div className="w-11/12 max-w-56 min-h-40 max-h-56 rounded-3xl bg-neutral-700 overflow-hidden flex justify-center">
+                        <AnimatedSkeleton
+                            offset={0}
+                            animationState="None"
+                        ></AnimatedSkeleton>
+                    </div>
                 </div>
                 <div className="pt-2 px-6">
                     {settingValues.map((setting) => (

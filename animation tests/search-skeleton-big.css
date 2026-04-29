@@ -1,0 +1,328 @@
+body,
+* {
+    box-sizing: border-box;
+    margin: 0px;
+
+    transition: all 0.5s;
+    user-select: none;
+    overflow: hidden;
+
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    color: #f7f7f7;
+}
+.canvas {
+    background-color: #22242a;
+    padding-top: 10px;
+    width: 512px;
+    height: 768px;
+    overflow: hidden;
+}
+
+.search-bar {
+    background-color: #4d5156;
+    width: 80%;
+    margin: auto;
+    height: 44px;
+    border-radius: 22px;
+
+    display: flex;
+    align-items: center;
+    gap: 13px;
+
+    & img,
+    & svg {
+        width: 24px;
+    }
+
+    /* AI Overview fully hidden */
+    &:active ~ .overview {
+        height: 0px;
+        border-bottom: #424654 0px;
+        opacity: 0;
+    }
+}
+
+.top-nav {
+    height: 48px;
+    border-bottom: #444746 1px solid;
+
+    display: flex;
+    padding: 6px 32px;
+    padding-top: 16px;
+
+    width: 100%;
+    &:active {
+        & :first-child {
+            width: 0px;
+        }
+        & :nth-last-child(2) {
+            width: 60px;
+            margin: 0 6px;
+        }
+    }
+
+    & div {
+        width: 70px;
+        height: 100%;
+        border-radius: 10px;
+        margin: 0 6px;
+
+        background-color: #46494f;
+    }
+    & :nth-child(1) {
+        background-color: #444858;
+    }
+    & :nth-child(3n) {
+        width: 55px;
+    }
+    & :nth-child(2n) {
+        width: 40px;
+    }
+    & :nth-child(4n) {
+        width: 47px;
+    }
+    & :nth-child(5n) {
+        width: 60px;
+    }
+    & :nth-child(6n) {
+        width: 55px;
+    }
+    & :nth-child(7n) {
+        width: 45px;
+    }
+    & :nth-last-child(2) {
+        width: 0px;
+        margin: 0px;
+    }
+}
+
+.overview {
+    height: 260px;
+    width: 90%;
+    margin: auto;
+    border-bottom: #424654 1px solid;
+    overflow: hidden;
+
+    position: relative;
+
+    &:active {
+        height: 85px;
+        border-bottom: #424654 0px;
+
+        & .contents {
+            opacity: 0;
+        }
+
+        & .button-bg-fade {
+            height: 50px;
+        }
+        & .show-button {
+            bottom: 0px;
+
+            & .content {
+                width: 35%;
+            }
+        }
+    }
+
+    & .title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 0 4px 0;
+        font-size: 0.85em;
+    }
+
+    & .contents {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding-top: 10px;
+
+        & .content {
+            background-color: #34517d;
+            height: 22px;
+            border-radius: 10px;
+            margin: 0 0 3px 0;
+        }
+
+        & :nth-child(2n) {
+            width: 97%;
+        }
+        & :nth-child(3n) {
+            width: 40%;
+            margin-bottom: 16px;
+        }
+    }
+
+    & .button-bg-fade {
+        position: absolute;
+        bottom: 0px;
+        width: 100%;
+        height: 130px;
+
+        background-image: linear-gradient(transparent 0%, #22242a 60%);
+    }
+
+    & .show-button {
+        position: absolute;
+        bottom: 12px;
+
+        border: #424654 1px solid;
+        background-color: #22242a;
+        border-radius: 20px;
+        height: 40px;
+        width: 70%;
+        margin: 0 15%;
+        z-index: 2;
+
+        font-size: 0.8em;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+
+        & .content {
+            background-color: #424654;
+            width: 25%;
+            height: 20px;
+            border-radius: 10px;
+        }
+
+        & svg {
+            width: 18px;
+            fill: #a8c7fa;
+        }
+    }
+}
+
+.results {
+    width: 90%;
+}
+
+.result {
+    width: 95%;
+    margin: auto;
+    margin-top: 10px;
+    margin-left: 20px;
+
+    display: flex;
+    gap: 7px;
+    padding: 10px;
+    flex-direction: column;
+
+    & .site-name {
+        background-color: #46494f;
+        margin-left: 2px;
+        width: 40%;
+        height: 16px;
+        border-radius: 10px;
+    }
+
+    & .title {
+        background-color: #779ad2;
+        width: 100%;
+        height: 22px;
+        border-radius: 10px;
+        margin: 0 0 3px 0;
+    }
+
+    & .content {
+        background-color: #434548;
+        margin-left: 2%;
+        width: 93%;
+        height: 16px;
+        border-radius: 10px;
+    }
+}
+
+.people-also-ask {
+    width: 90%;
+    margin: auto;
+    margin-top: 10px;
+
+    font-size: 1.1em;
+    font-weight: 450;
+
+    overflow: unset;
+
+    display: flex;
+    gap: 7px;
+    padding: 10px;
+    flex-direction: column;
+
+    &:active {
+        & .item .ai-label {
+            margin-left: 2%;
+            width: 50px;
+        }
+    }
+
+    & .title {
+        height: 30px;
+    }
+
+    & .item {
+        height: 36px;
+        width: 100%;
+        border-bottom: #444746 1px solid;
+
+        position: relative;
+        display: flex;
+        /* justify-content: space-between; */
+        align-items: flex-start;
+
+        & .ai-label {
+            background-color: #424654;
+            margin-left: 0px;
+            width: 0px;
+            margin-top: 2px;
+            height: 24px;
+            border-radius: 10px;
+        }
+
+        & .content {
+            background-color: #434548;
+            margin-left: 2%;
+            margin-top: 2px;
+            width: 50%;
+            height: 24px;
+            border-radius: 10px;
+        }
+
+        & svg {
+            position: absolute;
+            right: 0px;
+
+            width: 28px;
+            height: 28px;
+            fill: #c3c6d6;
+            background-color: #2c2e35;
+            border-radius: 24px;
+        }
+    }
+
+    & :nth-child(3n) .content {
+        width: 33%;
+    }
+    & :nth-child(4n) .content {
+        width: 67%;
+    }
+    & :nth-child(1 of .item:has(> .ai-label)) * {
+        transition-delay: 0s;
+    }
+    & :nth-child(2 of .item:has(> .ai-label)) * {
+        transition-delay: 0.1s;
+    }
+    & :nth-child(3 of .item:has(> .ai-label)) * {
+        transition-delay: 0.2s;
+    }
+    & :nth-child(4 of .item:has(> .ai-label)) * {
+        transition-delay: 0.3s;
+    }
+
+    & :last-child {
+        border-bottom: 0px;
+    }
+}
