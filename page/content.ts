@@ -1,21 +1,21 @@
-import { applyHide, revertHide } from "./modes/hide.ts";
-import { applyCondensed, revertCondensed } from "./modes/condensed.ts";
-import { appyHighlight, revertHighlight } from "./PAA modes/highlighted.ts";
+import { applyHide, revertHide } from "./modes/hide";
+import { applyCondensed, revertCondensed } from "./modes/condensed";
+import { appyHighlight, revertHighlight } from "./PAA modes/highlighted";
 import {
     appyHide as applyHideAIM,
     revertHide as revertHideAIM,
-} from "./AIM modes/hide.ts";
+} from "./AIM modes/hide";
 import {
     appyHide as applyHidePAA,
     revertHide as revertHidePAA,
-} from "./PAA modes/hide.ts";
+} from "./PAA modes/hide";
 import {
     waitForElm,
     isPeopleAlsoAskBox,
     isPeopleAlsoAskBoxAI
-} from "./utils.ts";
+} from "./utils";
 
-type overviewModes = "hide" | "condensed" | "visible";
+type overviewModes = "hidden" | "condensed" | "visible";
 
 async function applyOverviewMode(mode: overviewModes, prevMode: overviewModes) {
     // get AI Overview element
@@ -26,7 +26,7 @@ async function applyOverviewMode(mode: overviewModes, prevMode: overviewModes) {
 
     // revert previous
     switch (prevMode) {
-        case "hide":
+        case "hidden":
             revertHide(overviewElem as HTMLElement);
             break;
         case "condensed":
@@ -38,7 +38,7 @@ async function applyOverviewMode(mode: overviewModes, prevMode: overviewModes) {
 
     // apply new
     switch (mode) {
-        case "hide":
+        case "hidden":
             applyHide(overviewElem as HTMLElement);
             break;
         case "condensed":
@@ -49,7 +49,7 @@ async function applyOverviewMode(mode: overviewModes, prevMode: overviewModes) {
     }
 }
 
-type aimModes = "hide" | "visible";
+type aimModes = "hidden" | "visible";
 
 async function applyAIModeMode(mode: overviewModes, prevMode: overviewModes) {
     // get AI Overview element
@@ -73,7 +73,7 @@ async function applyAIModeMode(mode: overviewModes, prevMode: overviewModes) {
 
     // revert previous
     switch (prevMode) {
-        case "hide":
+        case "hidden":
             revertHideAIM(aimElem);
             break;
         case "visible":
@@ -82,7 +82,7 @@ async function applyAIModeMode(mode: overviewModes, prevMode: overviewModes) {
 
     // apply new
     switch (mode) {
-        case "hide":
+        case "hidden":
             applyHideAIM(aimElem);
             break;
         case "visible":
@@ -90,7 +90,7 @@ async function applyAIModeMode(mode: overviewModes, prevMode: overviewModes) {
     }
 }
 
-type paaModes = "hide" | "labelled" | "normal";
+type paaModes = "hidden" | "labelled" | "normal";
 type paaAnimatedModes = "never" | "onlyFirst" | "always";
 
 function applyAlsoAskDisplayMode(mode: paaModes, prevMode: paaModes) {
@@ -106,7 +106,7 @@ function applyAlsoAskDisplayMode(mode: paaModes, prevMode: paaModes) {
 function applyAlsoAskDisplayModeIndividual(mode: paaModes, prevMode: paaModes, elem: HTMLElement) {
     // revert previous
     switch (prevMode) {
-        case "hide":
+        case "hidden":
             revertHidePAA(elem);
             break;
         case "labelled":
@@ -118,7 +118,7 @@ function applyAlsoAskDisplayModeIndividual(mode: paaModes, prevMode: paaModes, e
 
     // apply new
     switch (mode) {
-        case "hide":
+        case "hidden":
             applyHidePAA(elem);
             break;
         case "labelled":

@@ -1,10 +1,10 @@
-import { useEffect, type FunctionComponent } from "react";
+import { useEffect, useState } from "react";
 import { SettingsOption } from "./SettingsOption";
-import { AnimatedSkeleton } from "./skeleton/AnimatedSkeleton";
 
 export type SettingProps = {
     title: string;
     description?: string;
+    PreviewSkeleton?: (value: string) => React.ReactElement;
     settingName: string;
     settingDefault: string;
     settingValues: SettingValue[];
@@ -15,42 +15,59 @@ type SettingValue = {
     settings?: SettingProps[];
 };
 
-export function SetSettingsValuesInitial({
-    settingName,
-    settingDefault,
-}: Pick<SettingProps, "settingName" | "settingDefault">) {
-    // don't break when designing on dev server
-    if (!chrome.storage) return;
-
-    chrome.storage.local.get([settingName]).then((result) => {
-        let settingValue = result[settingName] as string;
-
-        if (!result[settingName]) {
-            settingValue = settingDefault;
-            // set in storage
-            chrome.storage.local.set({
-                [settingName]: settingDefault,
-            });
-        }
-
-        // update ui
-        const elem = document.getElementById(
-            settingName + "." + settingValue,
-        ) as HTMLInputElement;
-
-        if (elem) elem.checked = true;
-    });
-}
-
-export const Setting: FunctionComponent<SettingProps> = ({
-    title,
+async function GetSettingsValues({
     settingName,
     settingDefault,
     settingValues,
-}) => {
+}: Pick<SettingProps, "settingName" | "settingDefault" | "settingValues">) {
+    // don't break when designing on dev server
+    if (!chrome.storage) return settingDefault;
+
+    const result = await chrome.storage.local.get([settingName]);
+
+    let settingValue = result[settingName] as string;
+
+    // if unset or invalid
+    if (
+        !result[settingName] ||
+        (result[settingName] &&
+            !settingValues.find((val) => val.name === result[settingName]))
+    ) {
+        settingValue = settingDefault;
+        // set to default in storage
+        chrome.storage.local.set({
+            [settingName]: settingDefault,
+        });
+    }
+
+    return settingValue;
+}
+
+export const Setting = ({
+    title,
+    settingName,
+    settingDefault,
+    PreviewSkeleton,
+    settingValues,
+}: SettingProps) => {
+    const [currentAnimationState, setCurrentAnimationState] =
+        useState(settingDefault);
+
     // Get data from storage when the component mounts
     useEffect(() => {
-        SetSettingsValuesInitial({ settingName, settingDefault });
+        GetSettingsValues({ settingName, settingDefault, settingValues }).then(
+            (settingValue) => {
+                // update ui
+                const elem = document.getElementById(
+                    settingName + "." + settingValue,
+                ) as HTMLInputElement;
+
+                if (elem) elem.checked = true;
+
+                // update animation state
+                setCurrentAnimationState(settingValue);
+            },
+        );
     });
 
     return (
@@ -62,14 +79,15 @@ export const Setting: FunctionComponent<SettingProps> = ({
             </legend>
 
             <div className="bg-neutral-800 py-4 rounded-lg drop-shadow-lg">
-                <div className="flex align-middle justify-center m-1.5">
-                    <div className="w-11/12 max-w-56 min-h-40 max-h-56 rounded-3xl bg-neutral-700 overflow-hidden flex justify-center">
-                        <AnimatedSkeleton
-                            offset={0}
-                            animationState="None"
-                        ></AnimatedSkeleton>
+                {PreviewSkeleton === undefined ? (
+                    ""
+                ) : (
+                    <div className="flex align-middle justify-center m-1.5">
+                        <div className="w-11/12 max-w-56 min-h-40 max-h-56 rounded-3xl bg-neutral-700 overflow-hidden flex justify-center">
+                            {PreviewSkeleton(currentAnimationState)}
+                        </div>
                     </div>
-                </div>
+                )}
                 <div className="pt-2 px-6">
                     {settingValues.map((setting) => (
                         <SettingsOption
@@ -84,6 +102,7 @@ export const Setting: FunctionComponent<SettingProps> = ({
                                     [settingName]: newValue,
                                 });
                             }}
+                            onHover={setCurrentAnimationState} // TODO: FIX
                         />
                     ))}
                 </div>

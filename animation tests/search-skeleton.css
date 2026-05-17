@@ -151,12 +151,12 @@ body,
     }
 }
 
-.results {
+/* .results {
     width: 90%;
-}
+} */
 
 .result {
-    width: 95%;
+    width: 85%;
     margin: auto;
     margin-top: 0.5em;
     margin-left: 1em;
@@ -192,8 +192,8 @@ body,
 }
 
 .people-also-ask {
-    width: 90%;
-    margin: auto;
+    width: 85%;
+    margin-left: 1.1em;
 
     font-size: 0.75em;
 

@@ -23,6 +23,7 @@ export type SettingOptionProps = {
     optionValue: string;
     optionSettings?: SettingProps[];
     onCheck: (newOptionValue: string) => void;
+    onHover: (newOptionValue: string) => void;
 };
 
 export const SettingsOption: FunctionComponent<SettingOptionProps> = ({
@@ -30,10 +31,14 @@ export const SettingsOption: FunctionComponent<SettingOptionProps> = ({
     optionValue,
     optionSettings,
     onCheck,
+    onHover,
 }) => {
     const [subsettingsOpen, setSubsettingsOpen] = useState(false);
     return (
-        <div className="w-full py-1 m-0 flex flex-col gap-2 last:[&>div]:border-b-0">
+        <div
+            className="w-full py-1 m-0 flex flex-col gap-2 last:[&>div]:border-b-0"
+            onMouseEnter={() => onHover(optionValue)} // TODO: this doesn't work at all really
+        >
             <div
                 className={`flex flex-row w-full ${optionSettings?.length ? "justify-between" : ""}`}
             >
