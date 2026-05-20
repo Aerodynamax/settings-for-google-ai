@@ -28,7 +28,7 @@ export const AnimatedOverviewSkeleton: FunctionComponent<
 
     switch (animationState) {
         case OverviewAnimationState.Condensed:
-            overviewStyles.height = "3.6em";
+            overviewStyles.height = "3.8em";
             overviewStyles.borderBottom = "#424654 0px";
 
             contentsStyles.opacity = "0";

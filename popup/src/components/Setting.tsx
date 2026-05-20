@@ -50,25 +50,46 @@ export const Setting = ({
     PreviewSkeleton,
     settingValues,
 }: SettingProps) => {
-    const [currentAnimationState, setCurrentAnimationState] =
-        useState(settingDefault);
+    const [storedValue, setStoredValue] = useState(settingDefault);
 
     // Get data from storage when the component mounts
     useEffect(() => {
         GetSettingsValues({ settingName, settingDefault, settingValues }).then(
             (settingValue) => {
-                // update ui
-                const elem = document.getElementById(
-                    settingName + "." + settingValue,
-                ) as HTMLInputElement;
-
-                if (elem) elem.checked = true;
-
                 // update animation state
-                setCurrentAnimationState(settingValue);
+                setStoredValue(settingValue);
             },
         );
     });
+
+    return (
+        <>
+            <SettingInternal
+                title={title}
+                settingName={settingName}
+                settingDefault={storedValue}
+                PreviewSkeleton={PreviewSkeleton}
+                settingValues={settingValues}
+            />
+        </>
+    );
+};
+
+const SettingInternal = ({
+    title,
+    settingName,
+    settingDefault,
+    PreviewSkeleton,
+    settingValues,
+}: SettingProps) => {
+    const [currentAnimationState, setCurrentAnimationState] =
+        useState(settingDefault);
+    const [currentValue, setCurrentValue] = useState(settingDefault);
+
+    // force update (idk what i'm doing)
+    useEffect(() => {
+        setCurrentValue(settingDefault);
+    }, [settingDefault]);
 
     return (
         <div className="mx-4">
@@ -94,15 +115,22 @@ export const Setting = ({
                             optionName={settingName}
                             optionValue={setting.name}
                             optionSettings={setting.settings}
+                            initialState={setting.name === currentValue}
                             onCheck={(newValue) => {
                                 // don't break when designing on dev server
                                 if (!chrome.storage) return;
+
+                                // update animation
+                                setCurrentValue(newValue);
 
                                 chrome.storage.local.set({
                                     [settingName]: newValue,
                                 });
                             }}
-                            onHover={setCurrentAnimationState} // TODO: FIX
+                            onHover={(val) => setCurrentAnimationState(val)}
+                            onUnhover={() =>
+                                setCurrentAnimationState(currentValue)
+                            }
                         />
                     ))}
                 </div>

@@ -1,4 +1,4 @@
-import { useState, type FunctionComponent } from "react";
+import { useEffect, useRef, useState, type FunctionComponent } from "react";
 import { type SettingProps } from "./Setting";
 import { SubSetting } from "./SubSetting";
 
@@ -22,22 +22,37 @@ export type SettingOptionProps = {
     optionName: string;
     optionValue: string;
     optionSettings?: SettingProps[];
+    initialState?: boolean;
     onCheck: (newOptionValue: string) => void;
     onHover: (newOptionValue: string) => void;
+    onUnhover: () => void;
 };
 
 export const SettingsOption: FunctionComponent<SettingOptionProps> = ({
     optionName,
     optionValue,
     optionSettings,
+    initialState = false,
     onCheck,
     onHover,
+    onUnhover,
 }) => {
     const [subsettingsOpen, setSubsettingsOpen] = useState(false);
+
+    // check the default value
+    const checkedRef = useRef<HTMLInputElement>(null);
+    useEffect(() => {
+        if (initialState && checkedRef.current) {
+            checkedRef.current.checked = true;
+            onUnhover();
+        }
+    }, [initialState]);
+
     return (
         <div
             className="w-full py-1 m-0 flex flex-col gap-2 last:[&>div]:border-b-0"
-            onMouseEnter={() => onHover(optionValue)} // TODO: this doesn't work at all really
+            onMouseEnter={() => onHover(optionValue)}
+            onMouseLeave={onUnhover}
         >
             <div
                 className={`flex flex-row w-full ${optionSettings?.length ? "justify-between" : ""}`}
@@ -53,6 +68,7 @@ export const SettingsOption: FunctionComponent<SettingOptionProps> = ({
                         id={optionName + "." + optionValue}
                         value={optionValue}
                         onChange={() => onCheck(optionValue)}
+                        ref={checkedRef}
                     />
                     <h3 className="text-sm font-normal text-gray-200 w-full h-full justify-between">
                         {valueToTitle(optionValue)}

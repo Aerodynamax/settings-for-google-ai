@@ -10,18 +10,20 @@ import { SearchResultSkeleton } from "./components/skeleton/SearchResultSkeleton
 import "./tailwind config.css";
 
 function App() {
-    const overviewDisplayAnimation = (value: string) => (
-        <AnimatedSkeleton>
-            <SearchNavSkeleton />
-            <AnimatedNavBarSkeleton />
-            <AnimatedOverviewSkeleton
-                animationState={value as OverviewAnimationState}
-            />
-            <SearchResultSkeleton />
-            <SearchResultSkeleton />
-            <SearchResultSkeleton />
-        </AnimatedSkeleton>
-    );
+    const overviewDisplayAnimation = (value: string) => {
+        return (
+            <AnimatedSkeleton>
+                <SearchNavSkeleton />
+                <AnimatedNavBarSkeleton />
+                <AnimatedOverviewSkeleton
+                    animationState={value as OverviewAnimationState}
+                />
+                <SearchResultSkeleton />
+                <SearchResultSkeleton />
+                <SearchResultSkeleton />
+            </AnimatedSkeleton>
+        );
+    };
 
     return (
         <div className="items-center-safe min-w-72 mw-max max-w-2xl m-auto">
