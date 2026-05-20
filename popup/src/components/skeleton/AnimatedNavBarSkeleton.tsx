@@ -21,6 +21,7 @@ export const AnimatedNavBarSkeleton: FunctionComponent<
 > = ({ animationState = "visible" }) => {
     const AIModeBtnStyles: CSSProperties = { transition: "all 0.5s" };
     const MoreElemBtnStyles: CSSProperties = { transition: "all 0.5s" };
+    const AllBtnStyles: CSSProperties = { transition: "all 0.5s" };
 
     switch (animationState) {
         case TopNavAnimationState.Visible:
@@ -30,13 +31,14 @@ export const AnimatedNavBarSkeleton: FunctionComponent<
 
             MoreElemBtnStyles.width = "2em";
             MoreElemBtnStyles.margin = "0 0.2em";
+            AllBtnStyles.marginLeft = "0.8em";
             break;
     }
 
     return (
         <div className="top-nav">
             <div style={AIModeBtnStyles}></div>
-            <div></div>
+            <div style={AllBtnStyles}></div>
             <div></div>
             <div></div>
             <div></div>

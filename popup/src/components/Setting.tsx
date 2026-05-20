@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SettingsOption } from "./SettingsOption";
 
 export type SettingProps = {
@@ -43,6 +43,9 @@ async function GetSettingsValues({
     return settingValue;
 }
 
+const hoverWaitBeforePlayingAnimationsMs = 300;
+const hoverWaitBeforeStoppingAnimationsMs = 500;
+
 export const Setting = ({
     title,
     settingName,
@@ -53,14 +56,12 @@ export const Setting = ({
     const [storedValue, setStoredValue] = useState(settingDefault);
 
     // Get data from storage when the component mounts
-    useEffect(() => {
-        GetSettingsValues({ settingName, settingDefault, settingValues }).then(
-            (settingValue) => {
-                // update animation state
-                setStoredValue(settingValue);
-            },
-        );
-    });
+    GetSettingsValues({ settingName, settingDefault, settingValues }).then(
+        (settingValue) => {
+            // update animation state
+            setStoredValue(settingValue);
+        },
+    );
 
     return (
         <>
@@ -82,14 +83,64 @@ const SettingInternal = ({
     PreviewSkeleton,
     settingValues,
 }: SettingProps) => {
+    // TODO: learn state management :(
+    const [pendingAnimationState, setPendingAnimationState] =
+        useState(settingDefault);
+    const [allowAnimationUpdates, setAllowAnimationUpdates] = useState(false);
+
     const [currentAnimationState, setCurrentAnimationState] =
         useState(settingDefault);
     const [currentValue, setCurrentValue] = useState(settingDefault);
 
-    // force update (idk what i'm doing)
+    // force update default value after chrome returns it (useEffect slop 🤩)
     useEffect(() => {
         setCurrentValue(settingDefault);
+        setCurrentAnimationState(settingDefault);
+        setPendingAnimationState(settingDefault);
+        console.log("reset");
     }, [settingDefault]);
+
+    const hoverTimeoutRef = useRef<number>(null);
+    const unhoverTimeoutRef = useRef<number>(null);
+
+    // wait before hover does anything
+    useEffect(() => {
+        // if not hovering the current one or currently pending hovers
+        if (
+            (hoverTimeoutRef.current === null || !allowAnimationUpdates) &&
+            pendingAnimationState !== currentValue
+        ) {
+            // if indecisive, don't show animations yet
+            if (hoverTimeoutRef.current !== null) {
+                clearTimeout(hoverTimeoutRef.current);
+            }
+
+            // clear
+            setAllowAnimationUpdates(false);
+            setCurrentAnimationState(currentValue);
+
+            // wait before playing any animations
+            hoverTimeoutRef.current = setTimeout(() => {
+                setAllowAnimationUpdates(true);
+            }, hoverWaitBeforePlayingAnimationsMs);
+        }
+
+        // update if allowed
+        if (allowAnimationUpdates) {
+            setCurrentAnimationState(pendingAnimationState);
+
+            // remove pending unhover
+            if (
+                unhoverTimeoutRef.current &&
+                pendingAnimationState !== currentValue // not sure how but this fixes animation clearing
+            ) {
+                clearTimeout(unhoverTimeoutRef.current);
+                unhoverTimeoutRef.current = null;
+            }
+        }
+    }, [allowAnimationUpdates, pendingAnimationState]);
+
+    useEffect(() => console.log("current val: ", currentValue), [currentValue]);
 
     return (
         <div className="mx-4">
@@ -109,28 +160,53 @@ const SettingInternal = ({
                         </div>
                     </div>
                 )}
-                <div className="pt-2 px-6">
+                <div
+                    className="pt-2 px-6"
+                    onMouseLeave={() => {
+                        // remove old
+                        if (unhoverTimeoutRef.current) {
+                            clearTimeout(unhoverTimeoutRef.current);
+                            unhoverTimeoutRef.current = null;
+                        }
+
+                        unhoverTimeoutRef.current = setTimeout(() => {
+                            // clear hover after leaving
+                            if (hoverTimeoutRef.current) {
+                                clearTimeout(hoverTimeoutRef.current);
+                                hoverTimeoutRef.current = null;
+
+                                // updating state done last as it kills this timeout
+                                setAllowAnimationUpdates(false);
+                                setPendingAnimationState(currentValue);
+                            }
+                        }, hoverWaitBeforeStoppingAnimationsMs);
+                    }}
+                >
                     {settingValues.map((setting) => (
                         <SettingsOption
                             optionName={settingName}
                             optionValue={setting.name}
                             optionSettings={setting.settings}
-                            initialState={setting.name === currentValue}
+                            initialState={setting.name === currentValue} // TODO: fix so switching to condensed works
                             onCheck={(newValue) => {
                                 // don't break when designing on dev server
                                 if (!chrome.storage) return;
 
                                 // update animation
                                 setCurrentValue(newValue);
+                                setPendingAnimationState(newValue);
+                                // setCurrentAnimationState(newValue);
 
                                 chrome.storage.local.set({
                                     [settingName]: newValue,
                                 });
                             }}
-                            onHover={(val) => setCurrentAnimationState(val)}
-                            onUnhover={() =>
-                                setCurrentAnimationState(currentValue)
-                            }
+                            onHover={(val) => {
+                                setPendingAnimationState(val);
+                            }}
+                            onUnhover={() => {
+                                setPendingAnimationState(currentValue);
+                            }}
                         />
                     ))}
                 </div>

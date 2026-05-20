@@ -20,13 +20,19 @@ export type PAAAnimationState =
 export const AnimatedPAASkeleton: FunctionComponent<AnimatedSkeletonProps> = ({
     animationState = "normal",
 }) => {
-    // TODO: GIVE 0.1S OFFSET
+    // TODO: ADD SUB SETTING ANIMATIONS
     const AIItemStyles: CSSProperties = { transition: "all 0.5s" };
     const AILabelStyles: CSSProperties = { transition: "all 0.5s" };
+    const NonAILabelStyles: CSSProperties = { transition: "all 0.5s" };
 
     switch (animationState) {
         case PAAAnimationState.Hidden:
-            AIItemStyles.display = "none";
+            // AIItemStyles.display = "none";
+            AIItemStyles.height = "0";
+            AIItemStyles.opacity = "0";
+            AIItemStyles.border = "#444746 0px solid";
+            AIItemStyles.marginTop = "-0.5em"; // remove the gap
+            NonAILabelStyles.borderBottom = "#444746 0px";
             break;
         case PAAAnimationState.Labelled:
             AILabelStyles.marginLeft = "2%";
@@ -40,7 +46,10 @@ export const AnimatedPAASkeleton: FunctionComponent<AnimatedSkeletonProps> = ({
         <div className="people-also-ask">
             <div className="title">People Also Ask</div>
             <div className="item" style={AIItemStyles}>
-                <span className="ai-label" style={AILabelStyles}></span>
+                <span
+                    className="ai-label"
+                    style={{ ...AILabelStyles, transitionDelay: "0s" }}
+                ></span>
                 <div className="content"></div>
                 <svg
                     aria-hidden="true"
@@ -51,7 +60,7 @@ export const AnimatedPAASkeleton: FunctionComponent<AnimatedSkeletonProps> = ({
                     <path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"></path>
                 </svg>
             </div>
-            <div className="item">
+            <div className="item" style={NonAILabelStyles}>
                 <div className="content"></div>
                 <svg
                     aria-hidden="true"
@@ -63,7 +72,10 @@ export const AnimatedPAASkeleton: FunctionComponent<AnimatedSkeletonProps> = ({
                 </svg>
             </div>
             <div className="item" style={AIItemStyles}>
-                <span className="ai-label" style={AILabelStyles}></span>
+                <span
+                    className="ai-label"
+                    style={{ ...AILabelStyles, transitionDelay: "0.1s" }}
+                ></span>
                 <div className="content"></div>
                 <svg
                     aria-hidden="true"
@@ -75,7 +87,10 @@ export const AnimatedPAASkeleton: FunctionComponent<AnimatedSkeletonProps> = ({
                 </svg>
             </div>
             <div className="item" style={AIItemStyles}>
-                <span className="ai-label" style={AILabelStyles}></span>
+                <span
+                    className="ai-label"
+                    style={{ ...AILabelStyles, transitionDelay: "0.2s" }}
+                ></span>
                 <div className="content"></div>
                 <svg
                     aria-hidden="true"

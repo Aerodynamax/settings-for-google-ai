@@ -42,9 +42,8 @@ export const SettingsOption: FunctionComponent<SettingOptionProps> = ({
     // check the default value
     const checkedRef = useRef<HTMLInputElement>(null);
     useEffect(() => {
-        if (initialState && checkedRef.current) {
-            checkedRef.current.checked = true;
-            onUnhover();
+        if (checkedRef.current) {
+            checkedRef.current.checked = initialState;
         }
     }, [initialState]);
 

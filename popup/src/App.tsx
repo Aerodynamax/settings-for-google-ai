@@ -1,9 +1,16 @@
 import { Setting } from "./components/Setting";
-import { AnimatedNavBarSkeleton } from "./components/skeleton/AnimatedNavBarSkeleton";
+import {
+    AnimatedNavBarSkeleton,
+    TopNavAnimationState,
+} from "./components/skeleton/AnimatedNavBarSkeleton";
 import {
     AnimatedOverviewSkeleton,
     OverviewAnimationState,
 } from "./components/skeleton/AnimatedOverviewSkeleton";
+import {
+    AnimatedPAASkeleton,
+    PAAAnimationState,
+} from "./components/skeleton/AnimatedPAASkeleton";
 import { AnimatedSkeleton } from "./components/skeleton/AnimatedSkeleton";
 import { SearchNavSkeleton } from "./components/skeleton/SearchNavSkeleton";
 import { SearchResultSkeleton } from "./components/skeleton/SearchResultSkeleton";
@@ -17,6 +24,31 @@ function App() {
                 <AnimatedNavBarSkeleton />
                 <AnimatedOverviewSkeleton
                     animationState={value as OverviewAnimationState}
+                />
+                <SearchResultSkeleton />
+                <SearchResultSkeleton />
+                <SearchResultSkeleton />
+            </AnimatedSkeleton>
+        );
+    };
+    const paaDisplayAnimation = (value: string) => {
+        return (
+            <AnimatedSkeleton offset={50}>
+                <SearchResultSkeleton />
+                <AnimatedPAASkeleton
+                    animationState={value as PAAAnimationState}
+                />
+                <SearchResultSkeleton />
+                <SearchResultSkeleton />
+            </AnimatedSkeleton>
+        );
+    };
+    const AIModeDisplayAnimation = (value: string) => {
+        return (
+            <AnimatedSkeleton>
+                <SearchNavSkeleton />
+                <AnimatedNavBarSkeleton
+                    animationState={value as TopNavAnimationState}
                 />
                 <SearchResultSkeleton />
                 <SearchResultSkeleton />
@@ -43,6 +75,7 @@ function App() {
                 <Setting
                     title='AI in "People also ask"'
                     settingName="peopleAlsoAskDisplay"
+                    PreviewSkeleton={paaDisplayAnimation}
                     settingDefault="labelled"
                     settingValues={[
                         { name: "hidden" },
@@ -70,6 +103,7 @@ function App() {
                 <Setting
                     title="AI mode button"
                     settingName="AIModeDisplay"
+                    PreviewSkeleton={AIModeDisplayAnimation}
                     settingDefault="hidden"
                     settingValues={[{ name: "hidden" }, { name: "visible" }]}
                 />
