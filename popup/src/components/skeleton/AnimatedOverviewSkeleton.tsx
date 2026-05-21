@@ -2,6 +2,7 @@ import type { CSSProperties, FunctionComponent } from "react";
 
 type AnimatedSkeletonProps = {
     animationState?: OverviewAnimationState;
+    instant?: boolean;
 };
 
 // stupid enum workaround
@@ -19,12 +20,22 @@ export type OverviewAnimationState =
 
 export const AnimatedOverviewSkeleton: FunctionComponent<
     AnimatedSkeletonProps
-> = ({ animationState = "normal" }) => {
-    const overviewStyles: CSSProperties = { transition: "all 0.5s" };
-    const bgFadeStyles: CSSProperties = { transition: "all 0.5s" };
-    const moreBtnStyles: CSSProperties = { transition: "all 0.5s" };
-    const moreBtnTitleStyles: CSSProperties = { transition: "all 0.5s" };
-    const contentsStyles: CSSProperties = { transition: "all 0.5s" };
+> = ({ animationState = "normal", instant = false }) => {
+    const overviewStyles: CSSProperties = {
+        transition: instant ? "" : "all 0.5s",
+    };
+    const bgFadeStyles: CSSProperties = {
+        transition: instant ? "" : "all 0.5s",
+    };
+    const moreBtnStyles: CSSProperties = {
+        transition: instant ? "" : "all 0.5s",
+    };
+    const moreBtnTitleStyles: CSSProperties = {
+        transition: instant ? "" : "all 0.5s",
+    };
+    const contentsStyles: CSSProperties = {
+        transition: instant ? "" : "all 0.5s",
+    };
 
     switch (animationState) {
         case OverviewAnimationState.Condensed:

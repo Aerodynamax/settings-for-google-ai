@@ -2,6 +2,7 @@ import type { CSSProperties, FunctionComponent } from "react";
 
 type AnimatedSkeletonProps = {
     animationState?: PAAAnimationState;
+    instant?: boolean;
 };
 
 // stupid enum workaround
@@ -19,11 +20,18 @@ export type PAAAnimationState =
 
 export const AnimatedPAASkeleton: FunctionComponent<AnimatedSkeletonProps> = ({
     animationState = "normal",
+    instant = false,
 }) => {
     // TODO: ADD SUB SETTING ANIMATIONS
-    const AIItemStyles: CSSProperties = { transition: "all 0.5s" };
-    const AILabelStyles: CSSProperties = { transition: "all 0.5s" };
-    const NonAILabelStyles: CSSProperties = { transition: "all 0.5s" };
+    const AIItemStyles: CSSProperties = {
+        transition: instant ? "" : "all 0.5s",
+    };
+    const AILabelStyles: CSSProperties = {
+        transition: instant ? "" : "all 0.5s",
+    };
+    const NonAILabelStyles: CSSProperties = {
+        transition: instant ? "" : "all 0.5s",
+    };
 
     switch (animationState) {
         case PAAAnimationState.Hidden:
@@ -74,7 +82,7 @@ export const AnimatedPAASkeleton: FunctionComponent<AnimatedSkeletonProps> = ({
             <div className="item" style={AIItemStyles}>
                 <span
                     className="ai-label"
-                    style={{ ...AILabelStyles, transitionDelay: "0.1s" }}
+                    style={{ ...AILabelStyles, transitionDelay: "0.2s" }}
                 ></span>
                 <div className="content"></div>
                 <svg
@@ -89,7 +97,7 @@ export const AnimatedPAASkeleton: FunctionComponent<AnimatedSkeletonProps> = ({
             <div className="item" style={AIItemStyles}>
                 <span
                     className="ai-label"
-                    style={{ ...AILabelStyles, transitionDelay: "0.2s" }}
+                    style={{ ...AILabelStyles, transitionDelay: "0.4s" }}
                 ></span>
                 <div className="content"></div>
                 <svg

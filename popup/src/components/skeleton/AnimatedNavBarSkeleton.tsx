@@ -2,6 +2,7 @@ import type { CSSProperties, FunctionComponent } from "react";
 
 type AnimatedSkeletonProps = {
     animationState?: TopNavAnimationState;
+    instant?: boolean;
 };
 
 // stupid enum workaround
@@ -18,10 +19,16 @@ export type TopNavAnimationState =
 
 export const AnimatedNavBarSkeleton: FunctionComponent<
     AnimatedSkeletonProps
-> = ({ animationState = "visible" }) => {
-    const AIModeBtnStyles: CSSProperties = { transition: "all 0.5s" };
-    const MoreElemBtnStyles: CSSProperties = { transition: "all 0.5s" };
-    const AllBtnStyles: CSSProperties = { transition: "all 0.5s" };
+> = ({ animationState = "visible", instant = false }) => {
+    const AIModeBtnStyles: CSSProperties = {
+        transition: instant ? "" : "all 0.5s",
+    };
+    const MoreElemBtnStyles: CSSProperties = {
+        transition: instant ? "" : "all 0.5s",
+    };
+    const AllBtnStyles: CSSProperties = {
+        transition: instant ? "" : "all 0.5s",
+    };
 
     switch (animationState) {
         case TopNavAnimationState.Visible:

@@ -2,8 +2,9 @@
     background-color: #22242a;
     padding-top: 10px;
     width: 224px;
-    height: 700px;
+    height: fit-content;
     overflow: hidden;
+    overflow-anchor: none;
 
     & * {
         box-sizing: border-box;

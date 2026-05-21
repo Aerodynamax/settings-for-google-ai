@@ -17,40 +17,47 @@ import { SearchResultSkeleton } from "./components/skeleton/SearchResultSkeleton
 import "./tailwind config.css";
 
 function App() {
-    const overviewDisplayAnimation = (value: string) => {
+    const overviewDisplayAnimation = (value: string, instant: boolean) => {
         return (
             <AnimatedSkeleton>
                 <SearchNavSkeleton />
-                <AnimatedNavBarSkeleton />
+                <AnimatedNavBarSkeleton instant={true} />
                 <AnimatedOverviewSkeleton
                     animationState={value as OverviewAnimationState}
+                    instant={instant}
                 />
                 <SearchResultSkeleton />
                 <SearchResultSkeleton />
-                <SearchResultSkeleton />
+                <AnimatedPAASkeleton instant={true} />
             </AnimatedSkeleton>
         );
     };
-    const paaDisplayAnimation = (value: string) => {
+    const paaDisplayAnimation = (value: string, instant: boolean) => {
         return (
             <AnimatedSkeleton offset={50}>
                 <SearchResultSkeleton />
                 <AnimatedPAASkeleton
                     animationState={value as PAAAnimationState}
+                    instant={instant}
                 />
+                <SearchResultSkeleton />
                 <SearchResultSkeleton />
                 <SearchResultSkeleton />
             </AnimatedSkeleton>
         );
     };
-    const AIModeDisplayAnimation = (value: string) => {
+    const AIModeDisplayAnimation = (value: string, instant: boolean) => {
         return (
             <AnimatedSkeleton>
                 <SearchNavSkeleton />
                 <AnimatedNavBarSkeleton
                     animationState={value as TopNavAnimationState}
+                    instant={instant}
                 />
-                <SearchResultSkeleton />
+                <AnimatedOverviewSkeleton
+                    animationState={OverviewAnimationState.Normal}
+                    instant={true}
+                />
                 <SearchResultSkeleton />
                 <SearchResultSkeleton />
             </AnimatedSkeleton>

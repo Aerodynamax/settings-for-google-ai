@@ -26,24 +26,7 @@ export const AnimatedSkeleton = ({
                 className="canvas"
                 style={{ transform: `translateY(-${offset}px)` }}
             >
-                {
-                    /* <SearchNavSkeleton />
-                <AnimatedNavBarSkeleton
-                    animationState={TopNavAnimationState.Visible}
-                ></AnimatedNavBarSkeleton>
-                <AnimatedOverviewSkeleton
-                    animationState={OverviewAnimationState.Hidden}
-                ></AnimatedOverviewSkeleton>
-                <SearchResultSkeleton />
-
-                <AnimatedPAASkeleton
-                    animationState={PAAAnimationState.Labelled}
-                ></AnimatedPAASkeleton>
-                <SearchResultSkeleton />
-                <SearchResultSkeleton />
-                <SearchResultSkeleton /> */
-                    children
-                }
+                {children}
             </div>
         </>
     );

@@ -4,7 +4,7 @@ import { SettingsOption } from "./SettingsOption";
 export type SettingProps = {
     title: string;
     description?: string;
-    PreviewSkeleton?: (value: string) => React.ReactElement;
+    PreviewSkeleton?: (value: string, instant: boolean) => React.ReactElement;
     settingName: string;
     settingDefault: string;
     settingValues: SettingValue[];
@@ -84,6 +84,7 @@ const SettingInternal = ({
     settingValues,
 }: SettingProps) => {
     // TODO: learn state management :(
+
     const [pendingAnimationState, setPendingAnimationState] =
         useState(settingDefault);
     const [allowAnimationUpdates, setAllowAnimationUpdates] = useState(false);
@@ -92,12 +93,12 @@ const SettingInternal = ({
         useState(settingDefault);
     const [currentValue, setCurrentValue] = useState(settingDefault);
 
+    const [updatePreviewInstantly, setUpdatePreviewInstantly] = useState(true);
+
     // force update default value after chrome returns it (useEffect slop 🤩)
     useEffect(() => {
         setCurrentValue(settingDefault);
         setCurrentAnimationState(settingDefault);
-        setPendingAnimationState(settingDefault);
-        console.log("reset");
     }, [settingDefault]);
 
     const hoverTimeoutRef = useRef<number>(null);
@@ -140,8 +141,6 @@ const SettingInternal = ({
         }
     }, [allowAnimationUpdates, pendingAnimationState]);
 
-    useEffect(() => console.log("current val: ", currentValue), [currentValue]);
-
     return (
         <div className="mx-4">
             <br />
@@ -154,9 +153,12 @@ const SettingInternal = ({
                 {PreviewSkeleton === undefined ? (
                     ""
                 ) : (
-                    <div className="flex align-middle justify-center m-1.5">
-                        <div className="w-11/12 max-w-56 min-h-40 max-h-56 rounded-3xl bg-neutral-700 overflow-hidden flex justify-center">
-                            {PreviewSkeleton(currentAnimationState)}
+                    <div className="flex align-middle justify-center m-1.5 scroll">
+                        <div className="w-11/12 max-w-56 min-h-40 max-h-56 rounded-3xl bg-neutral-700 overflow-clip flex justify-center">
+                            {PreviewSkeleton(
+                                currentAnimationState,
+                                updatePreviewInstantly,
+                            )}
                         </div>
                     </div>
                 )}
@@ -195,13 +197,15 @@ const SettingInternal = ({
                                 // update animation
                                 setCurrentValue(newValue);
                                 setPendingAnimationState(newValue);
-                                // setCurrentAnimationState(newValue);
 
                                 chrome.storage.local.set({
                                     [settingName]: newValue,
                                 });
                             }}
                             onHover={(val) => {
+                                // actually play animations
+                                setUpdatePreviewInstantly(false);
+
                                 setPendingAnimationState(val);
                             }}
                             onUnhover={() => {
