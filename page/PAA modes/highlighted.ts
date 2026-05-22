@@ -2,10 +2,6 @@
 const sparkle = "AI Overview";
 
 export function applyHighlight(mainPAAElem: HTMLElement, animate: boolean = true) {
-    if (mainPAAElem.hasAttribute("AIPAA")) return;
-
-    mainPAAElem.setAttribute("AIPAA", "");
-
     // get question's text
     const PAAText = mainPAAElem.querySelector(`[data-q]`)?.getAttribute('data-q');
 
@@ -101,7 +97,6 @@ export function applyHighlight(mainPAAElem: HTMLElement, animate: boolean = true
 }
 
 export function revertHighlight(mainPAAElem: HTMLElement) {
-    
     // delete indicator
     mainPAAElem.querySelectorAll(`[overviewAIPAAIndicator]`).forEach(elem => {
         elem.remove();

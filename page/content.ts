@@ -171,11 +171,11 @@ const observer = new MutationObserver((mutationList) => {
 
         // exit if wrong
         if (!aiPeopleAlsoAskBox) return;
-        if (aiPeopleAlsoAskBox && isPAABoxAlreadyTagged(aiPeopleAlsoAskBox)) return;
+        if (isPAABoxAlreadyTagged(aiPeopleAlsoAskBox)) return;
         if (!isPAABoxAI(aiPeopleAlsoAskBox)) return;
 
         // give "new" tag
-        if (isPAANew(aiPeopleAlsoAskBox)) aiPeopleAlsoAskBox.setAttribute("newPAA", "");
+        // if (isPAANew(aiPeopleAlsoAskBox)) aiPeopleAlsoAskBox.setAttribute("newPAA", "");
 
         applyToPAAElem(
             currentPeopleAlsoAskMode,

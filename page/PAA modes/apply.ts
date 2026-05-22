@@ -9,7 +9,7 @@ import { applyHighlight, revertHighlight } from "./highlighted";
 
 export function applyGlobally(mode: paaModes, prevMode: paaModes, animationMode: paaAnimatedModes) {
     // get all AI boxes
-    const peopleAlsoAskBoxesAI = getAllPAAElems().filter(isPAABoxAI);
+    const peopleAlsoAskBoxesAI = getAllPAAElems().filter((value) => isPAABoxAI(value));
 
     peopleAlsoAskBoxesAI.forEach((elem) =>
         applyToElem(mode, prevMode, animationMode, elem)
@@ -17,38 +17,47 @@ export function applyGlobally(mode: paaModes, prevMode: paaModes, animationMode:
 }
 
 export function applyToElem(mode: paaModes, prevMode: paaModes, animationMode: paaAnimatedModes, elem: HTMLElement) {
-    // revert previous
-    switch (prevMode) {
-        case "hidden":
-            revertHide(elem);
-            break;
-        case "labelled":
-            revertHighlight(elem);
-            break;
-        case "normal":
-        // do nothing
+    // revert previous if not already
+    if (isPAABoxAlreadyTagged(elem)) {
+        untagPAABox(elem);
+
+        switch (prevMode) {
+            case "hidden":
+                revertHide(elem);
+                break;
+            case "labelled":
+                revertHighlight(elem);
+                break;
+            case "normal":
+            // do nothing
+        }
     }
 
-    // apply new
-    switch (mode) {
-        case "hidden":
-            applyHide(elem);
-            break;
-        case "labelled":
-            switch (animationMode) {
-                case "always":
-                    applyHighlight(elem, true);
-                    break;
-                case "onlyFirst":
-                    applyHighlight(elem, !elem.hasAttribute("newPAA"));
-                    break;
-                case "never":
-                    applyHighlight(elem, false);
-            }
-            
-            break;
-        case "normal":
-        // do nothing
+    // apply new if not already
+    if (!isPAABoxAlreadyTagged(elem)) {
+        tagPAABox(elem);
+        
+        switch (mode) {
+            case "hidden":
+                applyHide(elem);
+                break;
+            case "labelled":
+                switch (animationMode) {
+                    case "always":
+                        applyHighlight(elem, true);
+                        break;
+                    case "onlyFirst":
+                        applyHighlight(elem, !isPAANew(elem));
+                        break;
+                    case "never":
+                        applyHighlight(elem, false);
+                }
+                
+                break;
+            case "normal":
+            // do nothing
+        }
+
     }
 }
 
@@ -95,6 +104,12 @@ function isPAABoxAIUngenerated(paaElem: HTMLElement): boolean {
 
 export function isPAABoxAlreadyTagged(paaElem: HTMLElement): boolean {
     return paaElem.hasAttribute("AIPAA");
+}
+export function tagPAABox(paaElem: HTMLElement) {
+    paaElem.setAttribute("AIPAA", "");
+}
+export function untagPAABox(paaElem: HTMLElement) {
+    paaElem.removeAttribute("AIPAA");
 }
 
 export function isPAANew(paaElem: HTMLElement): boolean {
