@@ -1,7 +1,7 @@
 
 const sparkle = "AI Overview";
 
-export function appyHighlight(mainPAAElem: HTMLElement, animate: boolean = true) {
+export function applyHighlight(mainPAAElem: HTMLElement, animate: boolean = true) {
     if (mainPAAElem.hasAttribute("AIPAA")) return;
 
     mainPAAElem.setAttribute("AIPAA", "");

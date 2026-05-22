@@ -1,18 +1,24 @@
 import { applyHide, revertHide } from "./modes/hide";
 import { applyCondensed, revertCondensed } from "./modes/condensed";
-import { appyHighlight, revertHighlight } from "./PAA modes/highlighted";
 import {
     appyHide as applyHideAIM,
     revertHide as revertHideAIM,
 } from "./AIM modes/hide";
 import {
-    appyHide as applyHidePAA,
-    revertHide as revertHidePAA,
-} from "./PAA modes/hide";
+    getPAABoxFromSubElem,
+    isPAABoxAI,
+    isPAABoxAlreadyTagged,
+    isPAANew
+} from "./PAA modes/apply";
 import {
-    waitForElm,
-    isPeopleAlsoAskBox,
-    isPeopleAlsoAskBoxAI
+    paaModes,
+    paaAnimatedModes,
+    applyGlobally as applyPAAGlobally,
+    applyToElem as applyToPAAElem
+} from './PAA modes/apply'
+import {
+    getFromStorageOrDefault,
+    waitForElm
 } from "./utils";
 
 type overviewModes = "hidden" | "condensed" | "visible";
@@ -90,75 +96,22 @@ async function applyAIModeMode(mode: overviewModes, prevMode: overviewModes) {
     }
 }
 
-type paaModes = "hidden" | "labelled" | "normal";
-type paaAnimatedModes = "never" | "onlyFirst" | "always";
-
-function applyAlsoAskDisplayMode(mode: paaModes, prevMode: paaModes) {
-    // get all AI boxes
-    const peopleAlsoAskBoxesAI = Array.from(
-        document.querySelectorAll(`div[jsname="yEVEwb"]`),
-    ).filter((elem) => isPeopleAlsoAskBoxAI(elem));
-
-    peopleAlsoAskBoxesAI.forEach((elem) =>
-        applyAlsoAskDisplayModeIndividual(mode, prevMode, elem as HTMLElement),
-    );
-}
-function applyAlsoAskDisplayModeIndividual(mode: paaModes, prevMode: paaModes, elem: HTMLElement) {
-    // revert previous
-    switch (prevMode) {
-        case "hidden":
-            revertHidePAA(elem);
-            break;
-        case "labelled":
-            revertHighlight(elem);
-            break;
-        case "normal":
-        // do nothing
-    }
-
-    // apply new
-    switch (mode) {
-        case "hidden":
-            applyHidePAA(elem);
-            break;
-        case "labelled":
-            appyHighlight(
-                elem,
-                currentpaaAnimatedMode === "always" || ( currentpaaAnimatedMode === "onlyFirst" && !elem.hasAttribute("newPAA"))
-            );
-            break;
-        case "normal":
-        // do nothing
-    }
-}
 
 // set page settings initially
-chrome.storage.local.get(["overviewDisplay"]).then(({ overviewDisplay }) => {
-    if (!overviewDisplay) overviewDisplay = "condensed";
-
-    const settingValue = overviewDisplay as overviewModes;
-
-    applyOverviewMode(settingValue, "visible");
-});
-
-// set page settings initially
-chrome.storage.local.get(["AIModeDisplay"]).then(({ AIModeDisplay }) => {
-    if (!AIModeDisplay) AIModeDisplay = "hide";
-
-    const settingValue = AIModeDisplay as aimModes;
-
-    applyAIModeMode(settingValue, "visible");
-});
+getFromStorageOrDefault("overviewDisplay", "condensed").then(overviewDisplay => 
+    applyOverviewMode(overviewDisplay as overviewModes, "visible")
+);
+getFromStorageOrDefault("AIModeDisplay", "hide").then(AIModeDisplay => 
+    applyAIModeMode(AIModeDisplay as aimModes, "visible")
+);
 
 let currentPeopleAlsoAskMode: paaModes = "labelled";
 
 let currentpaaAnimatedMode: paaAnimatedModes = "onlyFirst";
 
-chrome.storage.local.get(["paaAnimated"]).then(({ paaAnimated }) => {
-    if (!paaAnimated) paaAnimated = "onlyFirst";
-
-    currentpaaAnimatedMode = paaAnimated as paaAnimatedModes;
-});
+getFromStorageOrDefault("paaAnimated", "onlyFirst").then(paaAnimated => 
+    currentpaaAnimatedMode = paaAnimated as paaAnimatedModes
+);
 
 // reload as settings change
 chrome.storage.onChanged.addListener((changes, area) => {
@@ -177,9 +130,10 @@ chrome.storage.onChanged.addListener((changes, area) => {
     
     if (changes.peopleAlsoAskDisplay) {
         currentPeopleAlsoAskMode = changes.peopleAlsoAskDisplay.newValue as paaModes;
-        applyAlsoAskDisplayMode(
+        applyPAAGlobally(
             changes.peopleAlsoAskDisplay.newValue as paaModes,
             changes.peopleAlsoAskDisplay.oldValue as paaModes,
+            currentpaaAnimatedMode
         );
     }
 
@@ -192,60 +146,50 @@ chrome.storage.onChanged.addListener((changes, area) => {
 });
 
 // update new people also ask boxes with label if required
-
 const observer = new MutationObserver((mutationList) => {
-    // all ai overviews contain a "learn more" link,
-    // when we find this, we get the parent's parent's parent's ... node
 
+    // get all updated/potentially updated
     let allChangedNodes = mutationList.flatMap((mutation) => [
         ...mutation.addedNodes,
         mutation.target,
     ]);
 
-    // only unique & "learn more" links
-    allChangedNodes = allChangedNodes.filter((node, idx) => {
-        if (allChangedNodes.indexOf(node) !== idx) return false;
-        if (!(node instanceof HTMLAnchorElement)) return false;
+    // remove duplicates
+    allChangedNodes = allChangedNodes.filter((node, idx) => 
+        allChangedNodes.indexOf(node) === idx
+    );
 
-        return (
-            node.getAttribute("aria-label") ===
-            "Learn more about generative AI. Opens in a new tab."
+    // get HTMLElems
+    const allChangedHTMLElems = allChangedNodes.filter(node => node instanceof HTMLElement)
+                                                .map(node => node as HTMLElement);
+
+    // get only overviews
+    const allPaaHeadingElems = allChangedHTMLElems.filter(elem => isPAABoxAI(elem));
+
+    allChangedHTMLElems.forEach((elem) => {
+        const aiPeopleAlsoAskBox = getPAABoxFromSubElem(elem);
+
+        // exit if wrong
+        if (!aiPeopleAlsoAskBox) return;
+        if (aiPeopleAlsoAskBox && isPAABoxAlreadyTagged(aiPeopleAlsoAskBox)) return;
+        if (!isPAABoxAI(aiPeopleAlsoAskBox)) return;
+
+        // give "new" tag
+        if (isPAANew(aiPeopleAlsoAskBox)) aiPeopleAlsoAskBox.setAttribute("newPAA", "");
+
+        applyToPAAElem(
+            currentPeopleAlsoAskMode,
+            "normal",
+            currentpaaAnimatedMode,
+            aiPeopleAlsoAskBox,
         );
-    });
-
-    allChangedNodes.forEach((aiLearnMoreLink) => {
-        let aiPeopleAlsoAskBox = aiLearnMoreLink.parentElement;
-
-        while (aiPeopleAlsoAskBox && !isPeopleAlsoAskBox(aiPeopleAlsoAskBox)) {
-            aiPeopleAlsoAskBox = aiPeopleAlsoAskBox.parentElement;
-        }
-
-        if (aiPeopleAlsoAskBox && !aiPeopleAlsoAskBox.hasAttribute("AIPAA")) {
-
-            // new people also ask elems load in a sub element of the main people also ask container.
-            // this holder is invisible and doesn't have the progress bar elem.
-            // if there is no progress bar elem in our parent then we are new.
-            let allPeopleAlsoAskContainer = aiPeopleAlsoAskBox.parentElement;
-
-            let allProgressbarElems = [ ...allPeopleAlsoAskContainer?.children ?? [] ].filter((value) => value.getAttribute("role") === "progressbar");
-            
-            if (!allProgressbarElems || allProgressbarElems.length == 0) {
-                aiPeopleAlsoAskBox.setAttribute("newPAA", "");
-            }
-
-            applyAlsoAskDisplayModeIndividual(
-                currentPeopleAlsoAskMode,
-                "normal",
-                aiPeopleAlsoAskBox,
-            );
-        }
+        
     });
 });
 
 // get setting
-chrome.storage.local.get("peopleAlsoAskDisplay", ({ peopleAlsoAskDisplay }) => {
-    if (peopleAlsoAskDisplay)
-        currentPeopleAlsoAskMode = peopleAlsoAskDisplay as paaModes;
+getFromStorageOrDefault("peopleAlsoAskDisplay", "labelled").then(peopleAlsoAskDisplay => {
+    currentPeopleAlsoAskMode = peopleAlsoAskDisplay as paaModes;
 
     // get main page
     waitForElm(`#center_col`).then((mainPageNode) => {

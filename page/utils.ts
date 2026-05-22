@@ -21,21 +21,13 @@ export function waitForElm(selector: string, fromElem: Element | Document = docu
     });
 }
 
-export function isPeopleAlsoAskBox(peopleAlsoAskElem: Element): boolean {
-    if (!(peopleAlsoAskElem instanceof HTMLDivElement))
-        return false;
+export async function getFromStorageOrDefault(key: string, defaultValue: string): Promise<string> {
+    let value = await chrome.storage.local.get([key]);
     
-    if (peopleAlsoAskElem.getAttribute("jsname") !== "yEVEwb")
-        return false;
-    
-    return true;
-}
-
-export function isPeopleAlsoAskBoxAI(peopleAlsoAskElem: Element): boolean {
-    if (!isPeopleAlsoAskBox(peopleAlsoAskElem))
-        return false;
-    
-    return null !== peopleAlsoAskElem.querySelector(
-        `a[aria-label="Learn more about generative AI. Opens in a new tab."]`
-    );
+    if (value) {
+        if (typeof value[key] === "string" || value[key] instanceof String) {
+            return value[key] as string;
+        }
+    }
+    return defaultValue;
 }

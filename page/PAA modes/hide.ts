@@ -1,5 +1,5 @@
 
-export function appyHide(mainPAAElem: HTMLElement) {
+export function applyHide(mainPAAElem: HTMLElement) {
     mainPAAElem.setAttribute("overviewPAAOriginalDisplayMode", mainPAAElem.style.display);
     mainPAAElem.style.display = "none";
 }

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Setting } from "./components/Setting";
 import {
     AnimatedNavBarSkeleton,
@@ -17,27 +18,40 @@ import { SearchResultSkeleton } from "./components/skeleton/SearchResultSkeleton
 import "./tailwind config.css";
 
 function App() {
+    const [overviewDisplay, setOverviewDisplay] = useState("");
+    const [paaDisplay, setPaaDisplay] = useState("");
+    const [aiModeDisplay, setAiModeDisplay] = useState("");
+
     const overviewDisplayAnimation = (value: string, instant: boolean) => {
+        setOverviewDisplay(value);
         return (
             <AnimatedSkeleton>
                 <SearchNavSkeleton />
-                <AnimatedNavBarSkeleton instant={true} />
+                <AnimatedNavBarSkeleton
+                    animationState={aiModeDisplay as TopNavAnimationState}
+                    instant={instant}
+                />
                 <AnimatedOverviewSkeleton
-                    animationState={value as OverviewAnimationState}
+                    animationState={overviewDisplay as OverviewAnimationState}
                     instant={instant}
                 />
                 <SearchResultSkeleton />
                 <SearchResultSkeleton />
-                <AnimatedPAASkeleton instant={true} />
+                <AnimatedPAASkeleton
+                    animationState={paaDisplay as PAAAnimationState}
+                    instant={instant}
+                />
+                <SearchResultSkeleton />
             </AnimatedSkeleton>
         );
     };
     const paaDisplayAnimation = (value: string, instant: boolean) => {
+        setPaaDisplay(value);
         return (
             <AnimatedSkeleton offset={50}>
                 <SearchResultSkeleton />
                 <AnimatedPAASkeleton
-                    animationState={value as PAAAnimationState}
+                    animationState={paaDisplay as PAAAnimationState}
                     instant={instant}
                 />
                 <SearchResultSkeleton />
@@ -47,16 +61,17 @@ function App() {
         );
     };
     const AIModeDisplayAnimation = (value: string, instant: boolean) => {
+        setAiModeDisplay(value);
         return (
             <AnimatedSkeleton>
                 <SearchNavSkeleton />
                 <AnimatedNavBarSkeleton
-                    animationState={value as TopNavAnimationState}
+                    animationState={aiModeDisplay as TopNavAnimationState}
                     instant={instant}
                 />
                 <AnimatedOverviewSkeleton
-                    animationState={OverviewAnimationState.Normal}
-                    instant={true}
+                    animationState={overviewDisplay as OverviewAnimationState}
+                    instant={instant}
                 />
                 <SearchResultSkeleton />
                 <SearchResultSkeleton />
