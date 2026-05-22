@@ -164,7 +164,7 @@ const observer = new MutationObserver((mutationList) => {
                                                 .map(node => node as HTMLElement);
 
     // get only overviews
-    const allPaaHeadingElems = allChangedHTMLElems.filter(elem => isPAABoxAI(elem));
+    const allPaaHeadingElems = allChangedHTMLElems.filter(isPAABoxAI);
 
     allChangedHTMLElems.forEach((elem) => {
         const aiPeopleAlsoAskBox = getPAABoxFromSubElem(elem);
