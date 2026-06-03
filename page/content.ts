@@ -1,16 +1,9 @@
-import { applyHide, revertHide } from "./modes/hide";
-import { applyCondensed, revertCondensed } from "./modes/condensed";
-import {
-    appyHide as applyHideAIM,
-    revertHide as revertHideAIM,
-} from "./AIM modes/hide";
+import { overviewModes, apply as applyOverviewMode } from "./modes/apply";
+import { aimModes, apply as applyAIMMode } from "./AIM modes/apply";
 import {
     getPAABoxFromSubElem,
     isPAABoxAI,
     isPAABoxAlreadyTagged,
-    isPAANew
-} from "./PAA modes/apply";
-import {
     paaModes,
     paaAnimatedModes,
     applyGlobally as applyPAAGlobally,
@@ -21,88 +14,13 @@ import {
     waitForElm
 } from "./utils";
 
-type overviewModes = "hidden" | "condensed" | "visible";
-
-async function applyOverviewMode(mode: overviewModes, prevMode: overviewModes) {
-    // get AI Overview element
-    // gen vs cache properties: [https://www.diffchecker.com/1hSMKGfo/]
-    const overviewElem = await waitForElm(`div[jsname="dEwkXc"]`);
-
-    if (!overviewElem) return;
-
-    // revert previous
-    switch (prevMode) {
-        case "hidden":
-            revertHide(overviewElem as HTMLElement);
-            break;
-        case "condensed":
-            revertCondensed(overviewElem as HTMLElement);
-            break;
-        case "visible":
-        // do nothing
-    }
-
-    // apply new
-    switch (mode) {
-        case "hidden":
-            applyHide(overviewElem as HTMLElement);
-            break;
-        case "condensed":
-            applyCondensed(overviewElem as HTMLElement);
-            break;
-        case "visible":
-        // do nothing
-    }
-}
-
-type aimModes = "hidden" | "visible";
-
-async function applyAIModeMode(mode: overviewModes, prevMode: overviewModes) {
-    // get AI Overview element
-    // gen vs cache properties: [https://www.diffchecker.com/1hSMKGfo/]
-    const googleNavBarElem = await waitForElm(`div.beZ0tf.O1uzAe[role="list"]`);
-
-    if (!googleNavBarElem) return;
-
-    let aimElem: HTMLElement | null = null;
-
-    // find the AI Mode button element
-    googleNavBarElem.childNodes.forEach(node => {
-        const navElem = node as HTMLElement;
-
-        if (navElem.textContent.toLowerCase() == "ai mode") {
-            aimElem = navElem;
-        }
-    });
-
-    if (!aimElem) return;
-
-    // revert previous
-    switch (prevMode) {
-        case "hidden":
-            revertHideAIM(aimElem);
-            break;
-        case "visible":
-        // do nothing
-    }
-
-    // apply new
-    switch (mode) {
-        case "hidden":
-            applyHideAIM(aimElem);
-            break;
-        case "visible":
-        // do nothing
-    }
-}
-
 
 // set page settings initially
 getFromStorageOrDefault("overviewDisplay", "condensed").then(overviewDisplay => 
     applyOverviewMode(overviewDisplay as overviewModes, "visible")
 );
 getFromStorageOrDefault("AIModeDisplay", "hide").then(AIModeDisplay => 
-    applyAIModeMode(AIModeDisplay as aimModes, "visible")
+    applyAIMMode(AIModeDisplay as aimModes, "visible")
 );
 
 let currentPeopleAlsoAskMode: paaModes = "labelled";
@@ -117,16 +35,14 @@ getFromStorageOrDefault("paaAnimated", "onlyFirst").then(paaAnimated =>
 chrome.storage.onChanged.addListener((changes, area) => {
     if (area !== "local") return;
     
-    if (changes.paaAnimated) {
+    if (changes.paaAnimated)
         currentpaaAnimatedMode = changes.paaAnimated.newValue as paaAnimatedModes;
-    }
 
-    if (changes.overviewDisplay) {
+    if (changes.overviewDisplay)
         applyOverviewMode(
             changes.overviewDisplay.newValue as overviewModes,
             changes.overviewDisplay.oldValue as overviewModes,
         );
-    }
     
     if (changes.peopleAlsoAskDisplay) {
         currentPeopleAlsoAskMode = changes.peopleAlsoAskDisplay.newValue as paaModes;
@@ -137,12 +53,11 @@ chrome.storage.onChanged.addListener((changes, area) => {
         );
     }
 
-    if (changes.AIModeDisplay) {
-        applyAIModeMode(
+    if (changes.AIModeDisplay)
+        applyAIMMode(
             changes.AIModeDisplay.newValue as aimModes,
             changes.AIModeDisplay.oldValue as aimModes
         );
-    }
 });
 
 // update new people also ask boxes with label if required
@@ -173,9 +88,6 @@ const observer = new MutationObserver((mutationList) => {
         if (!aiPeopleAlsoAskBox) return;
         if (isPAABoxAlreadyTagged(aiPeopleAlsoAskBox)) return;
         if (!isPAABoxAI(aiPeopleAlsoAskBox)) return;
-
-        // give "new" tag
-        // if (isPAANew(aiPeopleAlsoAskBox)) aiPeopleAlsoAskBox.setAttribute("newPAA", "");
 
         applyToPAAElem(
             currentPeopleAlsoAskMode,

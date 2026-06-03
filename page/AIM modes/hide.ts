@@ -1,7 +1,7 @@
 import { waitForElm } from '../utils';
 
 
-export function appyHide(AIModeElement: HTMLElement) {
+export function applyHide(AIModeElement: HTMLElement) {
     AIModeElement.setAttribute("aimDisplay", AIModeElement.style.display);
     AIModeElement.style.display = "none";
 

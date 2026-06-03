@@ -189,14 +189,21 @@ const SettingInternal = ({
                             optionName={settingName}
                             optionValue={setting.name}
                             optionSettings={setting.settings}
-                            initialState={setting.name === currentValue} // TODO: fix so switching to condensed works
+                            initialState={setting.name === currentValue}
                             onCheck={(newValue) => {
                                 // don't break when designing on dev server
                                 if (!chrome.storage) return;
 
                                 // update animation
-                                setCurrentValue(newValue);
-                                setPendingAnimationState(newValue);
+                                if (allowAnimationUpdates) {
+                                    setPendingAnimationState(newValue);
+                                    setAllowAnimationUpdates(false);
+                                    setCurrentValue(newValue);
+                                } else {
+                                    setCurrentValue(newValue);
+                                    setAllowAnimationUpdates(true);
+                                    setAllowAnimationUpdates(false);
+                                }
 
                                 chrome.storage.local.set({
                                     [settingName]: newValue,

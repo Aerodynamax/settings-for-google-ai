@@ -1,4 +1,4 @@
-import { waitForElm } from "../utils.ts";
+import { waitForElm } from "../utils.js";
 
 export function applyCondensed(overviewElem: HTMLElement) {
     // do nothing if already open
