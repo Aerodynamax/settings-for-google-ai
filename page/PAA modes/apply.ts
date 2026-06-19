@@ -1,5 +1,20 @@
-export type paaModes = "hidden" | "labelled" | "normal";
-export type paaAnimatedModes = "never" | "onlyFirst" | "always";
+
+// stupid enum workaround
+export const paaModes = {
+    hidden: "hidden",
+    labelled: "labelled",
+    normal: "normal",
+} as const;
+// create a type from the object values
+export type paaModes = (typeof paaModes)[keyof typeof paaModes];
+
+export const paaAnimatedModes = {
+    never: "never",
+    onlyFirst: "onlyFirst",
+    always: "always",
+} as const;
+export type paaAnimatedModes = (typeof paaAnimatedModes)[keyof typeof paaAnimatedModes];
+
 
 //region apply PAA mode
 
@@ -22,13 +37,13 @@ export function applyToElem(mode: paaModes, prevMode: paaModes, animationMode: p
         untagPAABox(elem);
 
         switch (prevMode) {
-            case "hidden":
+            case paaModes.hidden:
                 revertHide(elem);
                 break;
-            case "labelled":
+            case paaModes.labelled:
                 revertHighlight(elem);
                 break;
-            case "normal":
+            case paaModes.normal:
             // do nothing
         }
     }
@@ -38,10 +53,10 @@ export function applyToElem(mode: paaModes, prevMode: paaModes, animationMode: p
         tagPAABox(elem);
         
         switch (mode) {
-            case "hidden":
+            case paaModes.hidden:
                 applyHide(elem);
                 break;
-            case "labelled":
+            case paaModes.labelled:
                 switch (animationMode) {
                     case "always":
                         applyHighlight(elem, true);
@@ -54,7 +69,7 @@ export function applyToElem(mode: paaModes, prevMode: paaModes, animationMode: p
                 }
                 
                 break;
-            case "normal":
+            case paaModes.normal:
             // do nothing
         }
 
@@ -76,16 +91,16 @@ export function getPAABoxFromSubElem(subElem: HTMLElement): HTMLElement | null {
 }
 
 export function getAllPAAElems(startingElem: HTMLElement | Document = document): HTMLElement[] {
-    return startingElem.querySelectorAll(`[jsname="${paaJSName}"]`)
+    return startingElem.querySelectorAll(paaSelector)
                         .values()
                         .filter(elem => elem instanceof HTMLElement)
                         .map(elem => elem as HTMLElement)
                         .toArray();
 }
 
-const paaJSName = "yEVEwb";
+const paaSelector = `[jsname="yEVEwb"]`;
 export function isElemPAAResult(elem: HTMLElement): boolean {
-    return elem.getAttribute("jsname") === paaJSName;    
+    return elem.matches(paaSelector);
 }
 
 export function isPAABoxAI(paaElem: HTMLElement): boolean {
@@ -105,15 +120,15 @@ function isPAABoxAIUngenerated(paaElem: HTMLElement): boolean {
 export function isPAABoxAlreadyTagged(paaElem: HTMLElement): boolean {
     return paaElem.hasAttribute("AIPAA");
 }
-export function tagPAABox(paaElem: HTMLElement) {
+export function tagPAABox(paaElem: HTMLElement): void {
     paaElem.setAttribute("AIPAA", "");
 }
-export function untagPAABox(paaElem: HTMLElement) {
+export function untagPAABox(paaElem: HTMLElement): void {
     paaElem.removeAttribute("AIPAA");
 }
 
 export function isPAANew(paaElem: HTMLElement): boolean {
-    // the people also ask elem holder hass a progress bar elem to show when loading new items.
+    // the people also ask elem holder has a progress bar elem to show when loading new items.
     // new people also ask elems load in a sub element of the main people also ask container.
     // regular elems will have the progress bar as a sister elem, new elems will not.
     let allPeopleAlsoAskContainer = paaElem.parentElement;

@@ -127,7 +127,26 @@ function App() {
                     settingName="AIModeDisplay"
                     PreviewSkeleton={AIModeDisplayAnimation}
                     settingDefault="hidden"
-                    settingValues={[{ name: "hidden" }, { name: "visible" }]}
+                    settingValues={[
+                        {
+                            name: "hidden",
+                            settings: [
+                                {
+                                    title: "Position",
+                                    description:
+                                        'Changes where in the more menu the "AI Mode" button should be shown.',
+                                    settingName: "aimMorePos",
+                                    settingDefault: "top",
+                                    settingValues: [
+                                        { name: "top" },
+                                        { name: "bottom" },
+                                        { name: "hidden" },
+                                    ],
+                                },
+                            ],
+                        },
+                        { name: "visible" },
+                    ]}
                 />
 
                 <br />

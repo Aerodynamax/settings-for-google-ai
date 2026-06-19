@@ -1,5 +1,5 @@
 import { overviewModes, apply as applyOverviewMode } from "./modes/apply";
-import { aimModes, apply as applyAIMMode } from "./AIM modes/apply";
+import { aimHiddenPositions, aimModes, apply as applyAIMMode } from "./AIM modes/apply";
 import {
     getPAABoxFromSubElem,
     isPAABoxAI,
@@ -7,7 +7,8 @@ import {
     paaModes,
     paaAnimatedModes,
     applyGlobally as applyPAAGlobally,
-    applyToElem as applyToPAAElem
+    applyToElem as applyToPAAElem,
+    isElemPAAResult
 } from './PAA modes/apply'
 import {
     getFromStorageOrDefault,
@@ -16,27 +17,50 @@ import {
 
 
 // set page settings initially
-getFromStorageOrDefault("overviewDisplay", "condensed").then(overviewDisplay => 
-    applyOverviewMode(overviewDisplay as overviewModes, "visible")
-);
-getFromStorageOrDefault("AIModeDisplay", "hide").then(AIModeDisplay => 
-    applyAIMMode(AIModeDisplay as aimModes, "visible")
+getFromStorageOrDefault("overviewDisplay", overviewModes.condensed).then(overviewDisplay => 
+    applyOverviewMode(overviewDisplay, overviewModes.visible)
 );
 
-let currentPeopleAlsoAskMode: paaModes = "labelled";
+let currentaimHiddenPos: aimHiddenPositions = aimHiddenPositions.top;
+let prevaimHiddenPos: aimHiddenPositions = currentaimHiddenPos;
+let currentaimMode: aimModes = aimModes.visible;
 
-let currentpaaAnimatedMode: paaAnimatedModes = "onlyFirst";
-
-getFromStorageOrDefault("paaAnimated", "onlyFirst").then(paaAnimated => 
-    currentpaaAnimatedMode = paaAnimated as paaAnimatedModes
-);
-
-// reload as settings change
-chrome.storage.onChanged.addListener((changes, area) => {
-    if (area !== "local") return;
+getFromStorageOrDefault("aimMorePos", currentaimHiddenPos).then(aimMorePos => {
+    prevaimHiddenPos = currentaimHiddenPos;
+    currentaimHiddenPos = aimMorePos;
     
+    // initial apply
+    getFromStorageOrDefault("AIModeDisplay", aimModes.hidden).then(AIModeDisplay => {
+        currentaimMode = AIModeDisplay;
+        applyAIMMode(AIModeDisplay, aimModes.visible, currentaimHiddenPos, prevaimHiddenPos);
+    });
+});
+
+
+let currentPeopleAlsoAskMode: paaModes = paaModes.labelled;
+
+let currentpaaAnimatedMode: paaAnimatedModes = paaAnimatedModes.onlyFirst;
+
+getFromStorageOrDefault("paaAnimated", currentpaaAnimatedMode).then(paaAnimated => 
+    currentpaaAnimatedMode = paaAnimated
+);
+
+// TODO: make better interface for this in utils.ts
+// reload as settings change
+chrome.storage.local.onChanged.addListener((changes) => {
     if (changes.paaAnimated)
         currentpaaAnimatedMode = changes.paaAnimated.newValue as paaAnimatedModes;
+
+    if (changes.aimMorePos) {
+        prevaimHiddenPos = currentaimHiddenPos;
+        currentaimHiddenPos = changes.aimMorePos.newValue as aimHiddenPositions;
+        applyAIMMode(
+            currentaimMode,
+            currentaimMode,
+            currentaimHiddenPos,
+            prevaimHiddenPos,
+        );
+    }
 
     if (changes.overviewDisplay)
         applyOverviewMode(
@@ -53,13 +77,18 @@ chrome.storage.onChanged.addListener((changes, area) => {
         );
     }
 
-    if (changes.AIModeDisplay)
+    if (changes.AIModeDisplay) {
+        currentaimMode = changes.AIModeDisplay.newValue as aimModes;
         applyAIMMode(
             changes.AIModeDisplay.newValue as aimModes,
-            changes.AIModeDisplay.oldValue as aimModes
+            changes.AIModeDisplay.oldValue as aimModes,
+            currentaimHiddenPos,
+            currentaimHiddenPos,
         );
+    }
 });
 
+// TODO: move to relevant apply.ts file
 // update new people also ask boxes with label if required
 const observer = new MutationObserver((mutationList) => {
 
@@ -79,7 +108,9 @@ const observer = new MutationObserver((mutationList) => {
                                                 .map(node => node as HTMLElement);
 
     // get only overviews
-    const allPaaHeadingElems = allChangedHTMLElems.filter(isPAABoxAI);
+    const allPaaHeadingElems = allChangedHTMLElems.filter(isElemPAAResult)
+                                                    .filter(isPAABoxAI)
+                                                    .filter((value) => !isPAABoxAlreadyTagged(value));
 
     allChangedHTMLElems.forEach((elem) => {
         const aiPeopleAlsoAskBox = getPAABoxFromSubElem(elem);
@@ -100,8 +131,8 @@ const observer = new MutationObserver((mutationList) => {
 });
 
 // get setting
-getFromStorageOrDefault("peopleAlsoAskDisplay", "labelled").then(peopleAlsoAskDisplay => {
-    currentPeopleAlsoAskMode = peopleAlsoAskDisplay as paaModes;
+getFromStorageOrDefault("peopleAlsoAskDisplay", currentPeopleAlsoAskMode).then(peopleAlsoAskDisplay => {
+    currentPeopleAlsoAskMode = peopleAlsoAskDisplay;
 
     // get main page
     waitForElm(`#center_col`).then((mainPageNode) => {

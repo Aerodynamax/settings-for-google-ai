@@ -2,34 +2,46 @@ import { waitForElm } from "../utils";
 import { applyCondensed, revertCondensed } from "./condensed";
 import { applyHide, revertHide } from "./hide";
 
-export type overviewModes = "hidden" | "condensed" | "visible";
+// stupid enum workaround
+export const overviewModes = {
+    hidden: "hidden",
+    condensed: "condensed",
+    visible: "visible",
+} as const;
+// create a type from the object values
+export type overviewModes =
+    (typeof overviewModes)[keyof typeof overviewModes];
 
-export function apply(mode: overviewModes, prevMode: overviewModes) {
+export async function apply(mode: overviewModes, prevMode: overviewModes) {
     getOverviewElem().then(overviewElem => {
         if (!overviewElem) return;
     
         // revert previous
         switch (prevMode) {
-            case "hidden":
+            case overviewModes.hidden:
                 revertHide(overviewElem as HTMLElement);
                 break;
-            case "condensed":
+            case overviewModes.condensed:
                 revertCondensed(overviewElem as HTMLElement);
                 break;
-            case "visible":
-            // do nothing
+            case overviewModes.visible:
+                // do nothing
+                break;
         }
+
+        debugger;
     
         // apply new
         switch (mode) {
-            case "hidden":
+            case overviewModes.hidden:
                 applyHide(overviewElem as HTMLElement);
                 break;
-            case "condensed":
+            case overviewModes.condensed:
                 applyCondensed(overviewElem as HTMLElement);
                 break;
-            case "visible":
-            // do nothing
+            case overviewModes.visible:
+                // do nothing
+                break;
         }
     });
 }

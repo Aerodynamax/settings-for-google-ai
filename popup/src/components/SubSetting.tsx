@@ -52,6 +52,8 @@ export const SubSetting: FunctionComponent<SettingProps> = ({
                                 [settingName]: newValue,
                             });
                         }}
+                        onHover={() => console.log("TODO")}
+                        onUnhover={() => console.log("TODO")}
                     />
                 ))}
             </div>

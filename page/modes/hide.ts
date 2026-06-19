@@ -1,43 +1,44 @@
 export function applyHide(overviewElem: HTMLElement) {
-    if (overviewElem)
-        overviewElem.style.display = "none";
-
-    // remove padding
-    const didYouMeanElemContainer = document.querySelector(`div.YNk70c.EjQTId`) as HTMLElement;
-    const overviewElemContainer = document.querySelector(`div.Kevs9.SLPe5b`) as HTMLElement;
-    const overviewInSearchResultsContainer = document.querySelector(`div.ULSxyf`) as HTMLElement;
-
-    if (didYouMeanElemContainer && didYouMeanElemContainer.getElementsByTagName("dynamic-visibility-control").length === 0)
-        didYouMeanElemContainer.style.display = "none";
-
-    if (overviewElemContainer)
-        overviewElemContainer.style.display = "none";
-
-    if (overviewInSearchResultsContainer) {
-        overviewInSearchResultsContainer.setAttribute("overviewOriginalMarginBottom", overviewInSearchResultsContainer.style.marginBottom);
-        overviewInSearchResultsContainer.style.marginBottom = "0px";
-    }
+    const containerElem = getOutermostContainer(overviewElem);
     
+    if (!containerElem) return;
+
+    containerElem.setAttribute("aimDisplay", containerElem.style.display);
+    containerElem.style.display = "none";
 }
 
 export function revertHide(overviewElem: HTMLElement) {
-    if (overviewElem)
-        overviewElem.style.display = "";
+    const containerElem = getOutermostContainer(overviewElem);
+    
+    if (!containerElem) return;
 
-    // remove padding
-    const otherOverviewElemContainer = document.querySelector(`div.YNk70c.EjQTId`) as HTMLElement;
-    const overviewElemContainer = document.querySelector(`div.Kevs9.SLPe5b`) as HTMLElement;
-    const overviewInSearchResultsContainer = document.querySelector(`div.ULSxyf`) as HTMLElement;
+    let origDisplay = containerElem.getAttribute("aimDisplay");
+    containerElem.style.display = (origDisplay !== null) ? origDisplay : containerElem.style.display;
+}
 
-    if (otherOverviewElemContainer)
-        otherOverviewElemContainer.style.display = "";
+function getOutermostContainer(startingElem: HTMLElement): HTMLElement | null {
+    let outermostContainer = startingElem.parentElement;
 
-    if (overviewElemContainer)
-        overviewElemContainer.style.display = "";
-
-    if (overviewInSearchResultsContainer) {
-        let origMarginBottom = overviewInSearchResultsContainer.getAttribute("overviewOriginalMarginBottom");
-        overviewInSearchResultsContainer.style.marginBottom = (origMarginBottom !== null) ? origMarginBottom : overviewInSearchResultsContainer.style.marginBottom;
-        overviewInSearchResultsContainer.removeAttribute("overviewOriginalMarginBottom");
+    while (outermostContainer && !isOutermostContainer(outermostContainer)) {
+        outermostContainer = outermostContainer.parentElement;
     }
+
+    return outermostContainer;
+}
+
+// check if it's parent holds the main page contents
+function isOutermostContainer(elem: HTMLElement): boolean {
+    return isOutermostElemSearchFeaturedOverview(elem) || isOutermostElemSearchResultsOverview(elem);
+}
+
+
+
+const overviewAtSearchTop = `div.bzXtMb.M8OgIe.dRpWwb`;
+function isOutermostElemSearchFeaturedOverview(elem: HTMLElement): boolean {
+    return elem.matches(overviewAtSearchTop);
+}
+
+const overviewInSearchResults = `div.ULSxyf`;
+function isOutermostElemSearchResultsOverview(elem: HTMLElement): boolean {
+    return elem.matches(overviewInSearchResults);
 }
